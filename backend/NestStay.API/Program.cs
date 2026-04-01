@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using NestStay.Application.Interfaces.Repositories;
 using NestStay.Infrastructure.Data;
+using NestStay.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         ServerVersion.AutoDetect(
             builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
+
+// Registro Unit of Work y repositorios
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IBlockedDateRepository, BlockedDateRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 var app = builder.Build();
 
