@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/bryanpeguerocamilo/.nuget/packages/swashbuckle.aspnetcore.swaggergen/**)"
+    ]
+  }
+}

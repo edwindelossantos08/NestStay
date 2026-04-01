@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using BCrypt.Net;
 using NestStay.Application.DTOs.Auth;
 using NestStay.Application.Interfaces.Repositories;
@@ -84,5 +85,53 @@ public class AuthService : IAuthService
         {
             Message = "Cuenta confirmada exitosamente. Ya puedes iniciar sesión."
         };
+    }
+
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
+    {
+        // Mensaje genérico por seguridad, no revelar si el email existe
+        var user = await _unitOfWork.Users.FindByEmailAsync(request.Email);
+        if (user is null)
+            throw new NotFoundException("Credenciales inválidas");
+
+        // La cuenta debe estar confirmada antes de permitir el login
+        if (!user.IsConfirmed)
+            throw new BusinessRuleException("Debes confirmar tu cuenta antes de iniciar sesión");
+
+        // Mensaje genérico para no revelar cuál campo es incorrecto
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            throw new NotFoundException("Credenciales inválidas");
+
+        var roles = user.GetRoles().ToList();
+        var token = _jwtService.GenerateToken(user.Id, user.Email, roles);
+
+        // Leer la expiración directamente del token generado
+        var handler = new JwtSecurityTokenHandler();
+        var expiresAt = handler.ReadJwtToken(token).ValidTo;
+
+        return new LoginResponse
+        {
+            Token = token,
+            ExpiresAt = expiresAt,
+            UserName = user.Name,
+            Roles = roles
+        };
+    }
+
+    public async Task AssignRoleAsync(int userId, AssignRoleRequest request)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        if (user is null)
+            throw new NotFoundException("Usuario no encontrado");
+
+        // Solo se permiten los roles definidos en el sistema
+        if (request.Role != "Host" && request.Role != "Guest")
+            throw new BusinessRuleException("Rol no válido");
+
+        if (user.GetRoles().Contains(request.Role))
+            throw new ConflictException("El usuario ya tiene ese rol");
+
+        user.AddRole(request.Role);
+        await _unitOfWork.CommitAsync();
     }
 }

@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NestStay.API;
+using NestStay.API.Extensions;
 using NestStay.Application.DTOs.Auth;
 using NestStay.Application.Interfaces.Services;
 
@@ -28,5 +30,21 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.ConfirmAccountAsync(token);
         return Ok(ApiResponse<ConfirmAccountResponse>.Ok(result, result.Message));
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var result = await _authService.LoginAsync(request);
+        return Ok(ApiResponse<LoginResponse>.Ok(result));
+    }
+
+    [Authorize]
+    [HttpPost("assign-role")]
+    public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
+    {
+        var userId = User.GetUserId();
+        await _authService.AssignRoleAsync(userId, request);
+        return Ok(ApiResponse<string>.Ok("Rol asignado exitosamente"));
     }
 }
