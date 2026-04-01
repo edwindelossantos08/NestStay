@@ -8,10 +8,12 @@ using NestStay.Application.Interfaces.Services;
 using NestStay.Application.Services;
 using NestStay.Infrastructure.Data;
 using NestStay.Infrastructure.Repositories;
+using NestStay.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
@@ -30,6 +32,9 @@ builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<BrevoEmailService>();
+builder.Services.AddScoped<IEmailService>(sp => sp.GetRequiredService<BrevoEmailService>());
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -62,5 +67,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
