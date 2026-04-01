@@ -7,7 +7,8 @@ public class ApiResponse<T>
     public T? Data { get; set; }
     public List<string> Errors { get; set; } = new();
 
-    public static ApiResponse<T> Ok(T data, string message = "Request successful") =>
+    // Métodos estáticos para construir respuestas de forma consistente
+    public static ApiResponse<T> Ok(T data, string message = "Operación exitosa") =>
         new() { Success = true, Message = message, Data = data };
 
     public static ApiResponse<T> Fail(string message, List<string>? errors = null) =>

@@ -10,6 +10,8 @@ public class User
     public string? ConfirmationToken { get; set; }
     public DateTime? TokenExpiresAt { get; set; }
     public DateTime CreatedAt { get; set; }
+    // Lista de roles separados por coma almacenados en BD
+    public string Roles { get; set; } = "Guest";
 
     public ICollection<Property> Properties { get; set; }
     public ICollection<Booking> Bookings { get; set; }
@@ -23,5 +25,14 @@ public class User
         Bookings = new List<Booking>();
         Notifications = new List<Notification>();
         Reviews = new List<Review>();
+    }
+
+    public IEnumerable<string> GetRoles() => Roles.Split(',');
+
+    public void AddRole(string role)
+    {
+        var current = GetRoles().ToList();
+        if (!current.Contains(role))
+            Roles = string.Join(',', current.Append(role));
     }
 }

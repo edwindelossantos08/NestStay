@@ -1,0 +1,58 @@
+using System.Net;
+using System.Text.Json;
+using NestStay.Domain.Exceptions;
+
+namespace NestStay.API.Middleware;
+
+public class ExceptionMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly IHostEnvironment _env;
+
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
+    {
+        _next = next;
+        _logger = logger;
+        _env = env;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+
+        var (statusCode, message) = exception switch
+        {
+            NotFoundException e       => (HttpStatusCode.NotFound, e.Message),
+            UnauthorizedException e   => (HttpStatusCode.Unauthorized, e.Message),
+            BusinessRuleException e   => (HttpStatusCode.UnprocessableEntity, e.Message),
+            ConflictException e       => (HttpStatusCode.Conflict, e.Message),
+            // En producción no exponer el detalle del error interno
+            _ => (HttpStatusCode.InternalServerError,
+                  _env.IsProduction() ? "An unexpected error occurred." : exception.Message)
+        };
+
+        context.Response.StatusCode = (int)statusCode;
+
+        var response = ApiResponse<object>.Fail(message);
+        var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        await context.Response.WriteAsync(json);
+    }
+}
