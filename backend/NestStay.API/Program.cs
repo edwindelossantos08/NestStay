@@ -57,12 +57,15 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddHttpClient<BrevoEmailService>();
 builder.Services.AddScoped<IEmailService>(sp => sp.GetRequiredService<BrevoEmailService>());
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        // Preservar los nombres originales de los claims del JWT (sub, role, etc.)
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

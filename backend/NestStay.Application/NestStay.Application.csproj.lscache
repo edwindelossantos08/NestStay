@@ -63,6 +63,11 @@ DTOs/Auth/
  LoginResponse.cs
  RegisterRequest.cs
  RegisterResponse.cs
+DTOs/Availability/
+ AvailabilityCheckResponse.cs
+ AvailabilityResponse.cs
+ BlockDatesRequest.cs
+ UnblockDatesRequest.cs
 DTOs/Properties/
  CreatePropertyRequest.cs
  PropertyResponse.cs
@@ -78,6 +83,7 @@ Interfaces/Repositories/
  IUserRepository.cs
 Interfaces/Services/
  IAuthService.cs
+ IAvailabilityService.cs
  IEmailService.cs
  IJwtService.cs
  IPropertyService.cs
@@ -87,6 +93,7 @@ obj/Debug/net10.0/
  NestStay.Application.GlobalUsings.g.cs
 Services/
  AuthService.cs
+ AvailabilityService.cs
  JwtService.cs
  PropertyService.cs
 
