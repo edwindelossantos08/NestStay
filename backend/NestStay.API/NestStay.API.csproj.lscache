@@ -60,6 +60,7 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 ApiResponse.cs
 Controllers/
  AuthController.cs
+ BookingsController.cs
  PropertiesController.cs
 Extensions/ClaimsExtensions.cs
 Middleware/ExceptionMiddleware.cs

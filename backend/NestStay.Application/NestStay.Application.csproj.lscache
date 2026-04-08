@@ -68,6 +68,9 @@ DTOs/Availability/
  AvailabilityResponse.cs
  BlockDatesRequest.cs
  UnblockDatesRequest.cs
+DTOs/Bookings/
+ BookingResponse.cs
+ CreateBookingRequest.cs
 DTOs/Properties/
  CreatePropertyRequest.cs
  PropertyResponse.cs
@@ -86,8 +89,10 @@ Interfaces/Repositories/
 Interfaces/Services/
  IAuthService.cs
  IAvailabilityService.cs
+ IBookingService.cs
  IEmailService.cs
  IJwtService.cs
+ INotificationService.cs
  IPropertyService.cs
 obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
@@ -96,7 +101,9 @@ obj/Debug/net10.0/
 Services/
  AuthService.cs
  AvailabilityService.cs
+ BookingService.cs
  JwtService.cs
+ NotificationService.cs
  PropertyService.cs
 
 [metadataReferences]
