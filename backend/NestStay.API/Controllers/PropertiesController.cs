@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NestStay.API.Extensions;
+using NestStay.Application.DTOs.Availability;
 using NestStay.Application.DTOs.Properties;
 using NestStay.Application.Interfaces.Services;
 
@@ -11,10 +12,14 @@ namespace NestStay.API.Controllers;
 public class PropertiesController : ControllerBase
 {
     private readonly IPropertyService _propertyService;
+    private readonly IAvailabilityService _availabilityService;
 
-    public PropertiesController(IPropertyService propertyService)
+    public PropertiesController(
+        IPropertyService propertyService,
+        IAvailabilityService availabilityService)
     {
         _propertyService = propertyService;
+        _availabilityService = availabilityService;
     }
 
     // POST /api/properties — solo el rol Host puede crear propiedades
@@ -64,5 +69,34 @@ public class PropertiesController : ControllerBase
         var hostId = User.GetUserId();
         var result = await _propertyService.GetByHostAsync(hostId);
         return Ok(ApiResponse<IEnumerable<PropertyResponse>>.Ok(result));
+    }
+
+    // POST /api/properties/{id}/block-dates — el host bloquea fechas de su propiedad
+    [HttpPost("{id:int}/block-dates")]
+    [Authorize(Roles = "Host")]
+    public async Task<IActionResult> BlockDates(int id, [FromBody] BlockDatesRequest request)
+    {
+        var hostId = User.GetUserId();
+        await _availabilityService.BlockDatesAsync(hostId, id, request);
+        return Ok(ApiResponse<string>.Ok("Fechas bloqueadas", "Fechas bloqueadas exitosamente"));
+    }
+
+    // DELETE /api/properties/{id}/block-dates — el host desbloquea fechas de su propiedad
+    [HttpDelete("{id:int}/block-dates")]
+    [Authorize(Roles = "Host")]
+    public async Task<IActionResult> UnblockDates(int id, [FromBody] UnblockDatesRequest request)
+    {
+        var hostId = User.GetUserId();
+        await _availabilityService.UnblockDatesAsync(hostId, id, request);
+        return Ok(ApiResponse<string>.Ok("Fechas desbloqueadas", "Fechas desbloqueadas exitosamente"));
+    }
+
+    // GET /api/properties/{id}/availability?year=&month= — público, consulta disponibilidad mensual
+    [HttpGet("{id:int}/availability")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAvailability(int id, [FromQuery] int year, [FromQuery] int month)
+    {
+        var result = await _availabilityService.GetAvailabilityAsync(id, year, month);
+        return Ok(ApiResponse<AvailabilityResponse>.Ok(result));
     }
 }
