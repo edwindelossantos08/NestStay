@@ -52,6 +52,16 @@ public class PropertiesController : ControllerBase
         return Ok(ApiResponse<string>.Ok("Propiedad eliminada", "Propiedad eliminada exitosamente"));
     }
 
+    // GET /api/properties/search — público, búsqueda con filtros y paginación
+    // Debe ir antes de /{id} para evitar conflictos de routing con "search"
+    [HttpGet("search")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Search([FromQuery] SearchPropertiesRequest request)
+    {
+        var result = await _propertyService.SearchAsync(request);
+        return Ok(ApiResponse<SearchPropertiesResponse>.Ok(result));
+    }
+
     // GET /api/properties/{id} — público, no requiere autenticación
     [HttpGet("{id:int}")]
     [AllowAnonymous]
