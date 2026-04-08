@@ -71,6 +71,8 @@ DTOs/Availability/
 DTOs/Properties/
  CreatePropertyRequest.cs
  PropertyResponse.cs
+ SearchPropertiesRequest.cs
+ SearchPropertiesResponse.cs
  UpdatePropertyRequest.cs
 Interfaces/Repositories/
  IBlockedDateRepository.cs

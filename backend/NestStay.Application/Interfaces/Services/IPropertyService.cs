@@ -9,4 +9,5 @@ public interface IPropertyService
     Task DeleteAsync(int hostId, int propertyId);
     Task<PropertyResponse> GetByIdAsync(int propertyId);
     Task<IEnumerable<PropertyResponse>> GetByHostAsync(int hostId);
+    Task<SearchPropertiesResponse> SearchAsync(SearchPropertiesRequest request);
 }

@@ -117,6 +117,65 @@ public class PropertyService : IPropertyService
         return result;
     }
 
+    public async Task<SearchPropertiesResponse> SearchAsync(SearchPropertiesRequest request)
+    {
+        // Si solo se provee uno de los dos, lanzar error
+        if (request.CheckIn.HasValue && !request.CheckOut.HasValue ||
+            !request.CheckIn.HasValue && request.CheckOut.HasValue)
+            throw new BusinessRuleException("Debes proveer tanto CheckIn como CheckOut");
+
+        if (request.CheckIn.HasValue && request.CheckOut.HasValue)
+        {
+            // La fecha de entrada no puede ser en el pasado
+            if (request.CheckIn.Value < DateOnly.FromDateTime(DateTime.UtcNow))
+                throw new BusinessRuleException("La fecha de entrada no puede ser en el pasado");
+
+            // La fecha de salida debe ser posterior a la entrada
+            if (request.CheckOut.Value <= request.CheckIn.Value)
+                throw new BusinessRuleException("La fecha de salida debe ser posterior a la entrada");
+        }
+
+        // Corregir silenciosamente valores fuera de rango
+        if (request.Page < 1) request.Page = 1;
+        if (request.PageSize < 1) request.PageSize = 1;
+        if (request.PageSize > 50) request.PageSize = 50;
+
+        var properties = await _uow.Properties.SearchAvailableAsync(
+            request.Location,
+            request.CheckIn,
+            request.CheckOut,
+            request.Capacity,
+            request.MinPrice,
+            request.MaxPrice,
+            request.Page,
+            request.PageSize);
+
+        // Contar el total sin paginación para calcular TotalPages
+        var totalCount = await _uow.Properties.CountSearchResultsAsync(
+            request.Location,
+            request.CheckIn,
+            request.CheckOut,
+            request.Capacity,
+            request.MinPrice,
+            request.MaxPrice);
+
+        var result = new List<PropertyResponse>();
+        foreach (var property in properties)
+        {
+            var avgRating = await _uow.Reviews.GetAverageRatingAsync(property.Id);
+            var reviews = await _uow.Reviews.GetByPropertyIdAsync(property.Id);
+            result.Add(MapToResponse(property, property.Host!, avgRating, reviews.Count()));
+        }
+
+        return new SearchPropertiesResponse
+        {
+            Properties = result,
+            TotalCount = totalCount,
+            Page       = request.Page,
+            PageSize   = request.PageSize
+        };
+    }
+
     // Mapeo centralizado de entidad a DTO de respuesta
     private static PropertyResponse MapToResponse(Property property, Domain.Entities.User host, double avgRating, int totalReviews) =>
         new PropertyResponse
