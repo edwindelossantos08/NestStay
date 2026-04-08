@@ -56,6 +56,7 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddHttpClient<BrevoEmailService>();
 builder.Services.AddScoped<IEmailService>(sp => sp.GetRequiredService<BrevoEmailService>());
 
