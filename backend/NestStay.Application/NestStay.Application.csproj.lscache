@@ -70,6 +70,8 @@ DTOs/Availability/
  UnblockDatesRequest.cs
 DTOs/Bookings/
  BookingResponse.cs
+ CancelBookingResponse.cs
+ CompleteBookingResponse.cs
  CreateBookingRequest.cs
 DTOs/Properties/
  CreatePropertyRequest.cs
