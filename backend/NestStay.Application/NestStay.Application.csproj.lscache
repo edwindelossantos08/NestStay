@@ -280,9 +280,17 @@ Services/
 ../NestStay.Domain/obj/Debug/net10.0/ref/NestStay.Domain.dll
 <NUGET>/
  bcrypt.net-next/4.1.0/lib/net10.0/BCrypt.Net-Next.dll
+ microsoft.entityframeworkcore.abstractions/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+ microsoft.entityframeworkcore.relational/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
+ microsoft.entityframeworkcore/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.dll
+ microsoft.extensions.caching.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Abstractions.dll
+ microsoft.extensions.caching.memory/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Memory.dll
  microsoft.extensions.configuration.abstractions/10.0.5/lib/net10.0/Microsoft.Extensions.Configuration.Abstractions.dll
- microsoft.extensions.dependencyinjection.abstractions/8.0.0/lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
- microsoft.extensions.logging.abstractions/8.0.0/lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+ microsoft.extensions.dependencyinjection.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+ microsoft.extensions.dependencyinjection/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.dll
+ microsoft.extensions.logging.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
+ microsoft.extensions.logging/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.dll
+ microsoft.extensions.options/9.0.0/lib/net9.0/Microsoft.Extensions.Options.dll
  microsoft.extensions.primitives/10.0.5/lib/net10.0/Microsoft.Extensions.Primitives.dll
  microsoft.identitymodel.abstractions/8.17.0/lib/net10.0/Microsoft.IdentityModel.Abstractions.dll
  microsoft.identitymodel.jsonwebtokens/8.17.0/lib/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
@@ -301,7 +309,10 @@ Services/
 ../../../../../usr/local/share/dotnet/sdk/10.0.103/Sdks/Microsoft.NET.Sdk/analyzers/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
-<NUGET>/microsoft.extensions.logging.abstractions/8.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
+<NUGET>/
+ microsoft.entityframeworkcore.analyzers/9.0.0/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
+ microsoft.extensions.logging.abstractions/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
+ microsoft.extensions.options/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
 
 [analyzerConfigFiles]
 ../../../../../usr/local/share/dotnet/sdk/10.0.103/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_10_default.globalconfig

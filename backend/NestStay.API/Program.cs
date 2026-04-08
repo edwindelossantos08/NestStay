@@ -59,6 +59,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+// Registrar DbContext base para que BookingService pueda inyectarlo y manejar transacciones
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddHttpClient<BrevoEmailService>();
 builder.Services.AddScoped<IEmailService>(sp => sp.GetRequiredService<BrevoEmailService>());

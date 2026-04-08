@@ -3,4 +3,5 @@
   <Project Path="NestStay.Application/NestStay.Application.csproj" />
   <Project Path="NestStay.Domain/NestStay.Domain.csproj" />
   <Project Path="NestStay.Infrastructure/NestStay.Infrastructure.csproj" />
+  <Project Path="NestStay.ConcurrencyTest/NestStay.ConcurrencyTest.csproj" />
 </Solution>
