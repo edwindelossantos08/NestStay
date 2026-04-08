@@ -9,7 +9,8 @@ obj/
 *.DotSettings.user
 
 # Archivos de configuración sensibles
-# NUNCA subir estos archivos
+# NUNCA subir estos archivos — contienen passwords y API keys
+appsettings.json
 appsettings.Development.json
 appsettings.Production.json
 
