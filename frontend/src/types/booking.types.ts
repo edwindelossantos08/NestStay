@@ -19,3 +19,15 @@ export interface CreateBookingRequest {
   checkIn: string
   checkOut: string
 }
+
+export interface CancelBookingResponse {
+  bookingId: number
+  message: string
+  status: string
+}
+
+export interface CompleteBookingResponse {
+  bookingId: number
+  message: string
+  status: string
+}

@@ -9,6 +9,7 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ConfirmAccountPage from './pages/auth/ConfirmAccountPage'
 import NotificationsPage from './pages/notifications/NotificationsPage'
+import HostLayout from './components/layout/HostLayout'
 import DashboardPage from './pages/host/DashboardPage'
 import MyPropertiesPage from './pages/host/MyPropertiesPage'
 import PropertyFormPage from './pages/host/PropertyFormPage'
@@ -32,13 +33,15 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
 
-        {/* Rutas protegidas por rol Host */}
+        {/* Rutas protegidas por rol Host — con sidebar lateral */}
         <Route element={<ProtectedRoute requiredRole="Host" />}>
-          <Route path="/host/dashboard" element={<DashboardPage />} />
-          <Route path="/host/properties" element={<MyPropertiesPage />} />
-          <Route path="/host/properties/new" element={<PropertyFormPage />} />
-          <Route path="/host/properties/:id/edit" element={<PropertyFormPage />} />
-          <Route path="/host/properties/:id/availability" element={<AvailabilityPage />} />
+          <Route element={<HostLayout />}>
+            <Route path="/host/dashboard" element={<DashboardPage />} />
+            <Route path="/host/properties" element={<MyPropertiesPage />} />
+            <Route path="/host/properties/new" element={<PropertyFormPage />} />
+            <Route path="/host/properties/:id/edit" element={<PropertyFormPage />} />
+            <Route path="/host/properties/:id/availability" element={<AvailabilityPage />} />
+          </Route>
         </Route>
 
         {/* Rutas protegidas por rol Guest */}

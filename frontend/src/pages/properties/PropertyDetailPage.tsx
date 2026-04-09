@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { usePropertyById, usePropertyReviews } from '../../hooks/useProperties'
+import { useCreateBooking } from '../../hooks/useBookings'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
+import { authApi } from '../../api/auth.api'
 import PropertyImage from '../../components/shared/PropertyImage'
 import StarRating from '../../components/shared/StarRating'
+import Modal from '../../components/ui/Modal'
 import { formatPrice, calculateNights, timeAgo } from '../../utils/formatters'
 
 // Card individual de reseña
@@ -47,14 +51,19 @@ export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>()
   const propertyId = Number(id)
   const navigate = useNavigate()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, hasRole } = useAuth()
+  const toast = useToast()
 
   const { data: property, isLoading, isError } = usePropertyById(propertyId)
   const { data: reviewsData } = usePropertyReviews(propertyId)
+  const { mutate: createBooking, isPending: booking } = useCreateBooking()
 
   // Estado del formulario de reserva
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
+  // Modal para asignar rol Guest si el usuario no lo tiene
+  const [showRoleModal, setShowRoleModal] = useState(false)
+  const [assigningRole, setAssigningRole] = useState(false)
 
   if (isLoading) return <DetailSkeleton />
 
@@ -82,13 +91,54 @@ export default function PropertyDetailPage() {
 
   const reviews = reviewsData?.reviews ?? property.latestReviews ?? []
 
+  const handleAssignGuestRole = async () => {
+    setAssigningRole(true)
+    try {
+      await authApi.assignRole({ role: 'Guest' })
+      setShowRoleModal(false)
+      toast.success('Rol activado', 'Ya puedes hacer reservas como huésped.')
+    } catch {
+      toast.error('Error', 'No se pudo asignar el rol. Intenta de nuevo.')
+    } finally {
+      setAssigningRole(false)
+    }
+  }
+
   const handleBooking = () => {
     if (!isAuthenticated) {
       navigate('/login')
       return
     }
-    // Reserva en construcción — se implementará en tarea 8.4
-    alert('Reserva en construcción')
+
+    if (!checkIn || !checkOut) {
+      toast.info('Selecciona fechas', 'Elige las fechas de check-in y check-out.')
+      return
+    }
+
+    // Verifica rol Guest — si no lo tiene, muestra modal para asignarse el rol
+    if (!hasRole('Guest')) {
+      setShowRoleModal(true)
+      return
+    }
+
+    createBooking(
+      { propertyId, checkIn, checkOut },
+      {
+        onSuccess: () => {
+          toast.success('¡Reserva confirmada!', 'Tu reserva fue creada exitosamente.')
+          navigate('/my-bookings')
+        },
+        onError: (err: unknown) => {
+          // Error 409 indica fechas con conflicto de disponibilidad
+          const status = (err as { response?: { status?: number } })?.response?.status
+          if (status === 409) {
+            toast.error('Fechas no disponibles', 'Esas fechas ya están reservadas. Elige otras.')
+          } else {
+            toast.error('Error al reservar', 'No se pudo crear la reserva. Intenta de nuevo.')
+          }
+        },
+      }
+    )
   }
 
   return (
@@ -244,9 +294,14 @@ export default function PropertyDetailPage() {
 
                 <button
                   onClick={handleBooking}
-                  className="w-full bg-[#c9a84c] hover:bg-[#b8963e] text-white font-semibold py-2.5 rounded-xl transition-colors"
+                  disabled={booking}
+                  className="w-full bg-[#c9a84c] hover:bg-[#b8963e] text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-60"
                 >
-                  {isAuthenticated ? 'Reservar' : 'Inicia sesión para reservar'}
+                  {booking
+                    ? 'Reservando...'
+                    : isAuthenticated
+                    ? 'Reservar ahora'
+                    : 'Inicia sesión para reservar'}
                 </button>
 
                 {!isAuthenticated && (
@@ -266,6 +321,33 @@ export default function PropertyDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal para asignar rol Guest si el usuario no lo tiene */}
+      <Modal
+        open={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        title="Activa tu cuenta de huésped"
+      >
+        <p className="text-sm text-gray-600">
+          Para hacer reservas necesitas activar el rol de huésped en tu cuenta.
+          Es gratis e instantáneo.
+        </p>
+        <div className="flex gap-3 mt-6">
+          <button
+            onClick={() => setShowRoleModal(false)}
+            className="flex-1 border border-gray-200 text-gray-700 py-2 rounded-xl text-sm hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleAssignGuestRole}
+            disabled={assigningRole}
+            className="flex-1 bg-[#1e3a5f] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#163152] transition-colors disabled:opacity-60"
+          >
+            {assigningRole ? 'Activando...' : 'Activar rol huésped'}
+          </button>
+        </div>
+      </Modal>
     </div>
   )
 }

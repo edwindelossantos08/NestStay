@@ -76,3 +76,26 @@ export const useDeleteProperty = () => {
       queryClient.invalidateQueries({ queryKey: ['my-properties'] }),
   })
 }
+
+export const useBlockDates = (propertyId: number) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (dates: string[]) => propertiesApi.blockDates(propertyId, dates),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['properties', propertyId, 'availability'],
+      }),
+  })
+}
+
+export const useUnblockDates = (propertyId: number) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (dates: string[]) =>
+      propertiesApi.unblockDates(propertyId, dates),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['properties', propertyId, 'availability'],
+      }),
+  })
+}
