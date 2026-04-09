@@ -9,6 +9,8 @@ export interface PropertyResponse {
   capacity: number
   hostId: number
   hostName: string
+  // URL de imagen proporcionada por el host, puede ser null
+  imageUrl?: string
   averageRating: number
   totalReviews: number
   createdAt: string
@@ -21,6 +23,17 @@ export interface CreatePropertyRequest {
   location: string
   pricePerNight: number
   capacity: number
+  // Opcional: el host puede pegar una URL de imagen
+  imageUrl?: string
+}
+
+export interface UpdatePropertyRequest {
+  title: string
+  description: string
+  location: string
+  pricePerNight: number
+  capacity: number
+  imageUrl?: string
 }
 
 export interface SearchPropertiesRequest {
@@ -40,4 +53,11 @@ export interface SearchPropertiesResponse {
   page: number
   pageSize: number
   totalPages: number
+}
+
+export interface AvailabilityResponse {
+  propertyId: number
+  blockedDates: string[]
+  bookedDates: string[]
+  availableDates: string[]
 }
