@@ -1,14 +1,19 @@
 import apiClient from './axios'
-import type { NotificationListResponse } from '../types/notification.types'
 import type { ApiResponse } from '../types/api.types'
+import type { NotificationListResponse } from '../types/notification.types'
 
 export const notificationsApi = {
   getAll: () =>
     apiClient.get<ApiResponse<NotificationListResponse>>('/api/notifications'),
 
+  getUnread: () =>
+    apiClient.get<ApiResponse<NotificationListResponse>>(
+      '/api/notifications/unread'
+    ),
+
   markAsRead: (id: number) =>
-    apiClient.post<ApiResponse<null>>(`/api/notifications/${id}/read`),
+    apiClient.put<ApiResponse<string>>(`/api/notifications/${id}/read`),
 
   markAllAsRead: () =>
-    apiClient.post<ApiResponse<null>>('/api/notifications/read-all'),
+    apiClient.put<ApiResponse<string>>('/api/notifications/read-all'),
 }

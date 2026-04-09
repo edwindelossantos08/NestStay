@@ -39,7 +39,9 @@ export const useCompleteBooking = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => bookingsApi.complete(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['received-bookings'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['received-bookings'] })
+      queryClient.invalidateQueries({ queryKey: ['my-bookings'] })
+    },
   })
 }
