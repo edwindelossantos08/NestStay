@@ -79,6 +79,10 @@ DTOs/Properties/
  SearchPropertiesRequest.cs
  SearchPropertiesResponse.cs
  UpdatePropertyRequest.cs
+DTOs/Reviews/
+ CreateReviewRequest.cs
+ PropertyReviewsResponse.cs
+ ReviewResponse.cs
 Interfaces/Repositories/
  IBlockedDateRepository.cs
  IBookingRepository.cs
@@ -96,6 +100,7 @@ Interfaces/Services/
  IJwtService.cs
  INotificationService.cs
  IPropertyService.cs
+ IReviewService.cs
 obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
  NestStay.Application.AssemblyInfo.cs
@@ -107,6 +112,7 @@ Services/
  JwtService.cs
  NotificationService.cs
  PropertyService.cs
+ ReviewService.cs
 
 [metadataReferences]
 ../../../../../usr/local/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/

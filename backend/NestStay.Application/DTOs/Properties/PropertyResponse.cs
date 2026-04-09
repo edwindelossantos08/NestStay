@@ -1,3 +1,5 @@
+using NestStay.Application.DTOs.Reviews;
+
 namespace NestStay.Application.DTOs.Properties;
 
 public class PropertyResponse
@@ -15,4 +17,6 @@ public class PropertyResponse
     public double AverageRating { get; set; }
     public int TotalReviews { get; set; }
     public DateTime CreatedAt { get; set; }
+    // Últimas 5 reseñas, solo se incluyen en GetByIdAsync
+    public List<ReviewResponse> LatestReviews { get; set; } = [];
 }

@@ -62,6 +62,7 @@ Controllers/
  AuthController.cs
  BookingsController.cs
  PropertiesController.cs
+ ReviewsController.cs
 Extensions/ClaimsExtensions.cs
 Middleware/ExceptionMiddleware.cs
 obj/Debug/net10.0/

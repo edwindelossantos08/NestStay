@@ -1,4 +1,5 @@
 using NestStay.Application.DTOs.Properties;
+using NestStay.Application.DTOs.Reviews;
 using NestStay.Application.Interfaces.Repositories;
 using NestStay.Application.Interfaces.Services;
 using NestStay.Domain.Entities;
@@ -93,11 +94,27 @@ public class PropertyService : IPropertyService
         if (property is null)
             throw new NotFoundException("Propiedad", propertyId);
 
-        var host = await _uow.Users.GetByIdAsync(property.HostId);
+        var host      = await _uow.Users.GetByIdAsync(property.HostId);
         var avgRating = await _uow.Reviews.GetAverageRatingAsync(propertyId);
-        var reviews = await _uow.Reviews.GetByPropertyIdAsync(propertyId);
+        var reviews   = (await _uow.Reviews.GetByPropertyIdAsync(propertyId)).ToList();
 
-        return MapToResponse(property, host!, avgRating, reviews.Count());
+        // Últimas 5 reseñas ordenadas por fecha descendente
+        var latestReviews = reviews
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(5)
+            .Select(r => new ReviewResponse
+            {
+                Id         = r.Id,
+                BookingId  = r.BookingId,
+                PropertyId = r.PropertyId,
+                GuestName  = r.Guest!.Name,
+                Rating     = r.Rating,
+                Comment    = r.Comment,
+                CreatedAt  = r.CreatedAt
+            })
+            .ToList();
+
+        return MapToResponse(property, host!, avgRating, reviews.Count, latestReviews);
     }
 
     public async Task<IEnumerable<PropertyResponse>> GetByHostAsync(int hostId)
@@ -177,7 +194,12 @@ public class PropertyService : IPropertyService
     }
 
     // Mapeo centralizado de entidad a DTO de respuesta
-    private static PropertyResponse MapToResponse(Property property, Domain.Entities.User host, double avgRating, int totalReviews) =>
+    private static PropertyResponse MapToResponse(
+        Property property,
+        Domain.Entities.User host,
+        double avgRating,
+        int totalReviews,
+        List<ReviewResponse>? latestReviews = null) =>
         new PropertyResponse
         {
             Id            = property.Id,
@@ -191,6 +213,7 @@ public class PropertyService : IPropertyService
             ImageUrl      = property.ImageUrl,
             AverageRating = avgRating,
             TotalReviews  = totalReviews,
-            CreatedAt     = property.CreatedAt
+            CreatedAt     = property.CreatedAt,
+            LatestReviews = latestReviews ?? []
         };
 }

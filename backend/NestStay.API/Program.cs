@@ -62,6 +62,7 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 // Registrar DbContext base para que BookingService pueda inyectarlo y manejar transacciones
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddHttpClient<BrevoEmailService>();
 builder.Services.AddScoped<IEmailService>(sp => sp.GetRequiredService<BrevoEmailService>());
 

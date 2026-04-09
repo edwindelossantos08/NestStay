@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NestStay.API.Extensions;
 using NestStay.Application.DTOs.Availability;
 using NestStay.Application.DTOs.Properties;
+using NestStay.Application.DTOs.Reviews;
 using NestStay.Application.Interfaces.Services;
 
 namespace NestStay.API.Controllers;
@@ -13,13 +14,16 @@ public class PropertiesController : ControllerBase
 {
     private readonly IPropertyService _propertyService;
     private readonly IAvailabilityService _availabilityService;
+    private readonly IReviewService _reviewService;
 
     public PropertiesController(
         IPropertyService propertyService,
-        IAvailabilityService availabilityService)
+        IAvailabilityService availabilityService,
+        IReviewService reviewService)
     {
-        _propertyService = propertyService;
+        _propertyService     = propertyService;
         _availabilityService = availabilityService;
+        _reviewService       = reviewService;
     }
 
     // POST /api/properties — solo el rol Host puede crear propiedades
@@ -108,5 +112,14 @@ public class PropertiesController : ControllerBase
     {
         var result = await _availabilityService.GetAvailabilityAsync(id, year, month);
         return Ok(ApiResponse<AvailabilityResponse>.Ok(result));
+    }
+
+    // GET /api/properties/{id}/reviews — público, consulta reseñas de una propiedad
+    [HttpGet("{id:int}/reviews")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetReviews(int id)
+    {
+        var result = await _reviewService.GetByPropertyAsync(id);
+        return Ok(ApiResponse<PropertyReviewsResponse>.Ok(result));
     }
 }
