@@ -73,6 +73,9 @@ DTOs/Bookings/
  CancelBookingResponse.cs
  CompleteBookingResponse.cs
  CreateBookingRequest.cs
+DTOs/Notifications/
+ NotificationListResponse.cs
+ NotificationResponse.cs
 DTOs/Properties/
  CreatePropertyRequest.cs
  PropertyResponse.cs

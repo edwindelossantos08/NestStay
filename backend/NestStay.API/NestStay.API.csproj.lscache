@@ -61,6 +61,7 @@ ApiResponse.cs
 Controllers/
  AuthController.cs
  BookingsController.cs
+ NotificationsController.cs
  PropertiesController.cs
  ReviewsController.cs
 Extensions/ClaimsExtensions.cs
