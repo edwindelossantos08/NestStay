@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Users, Home } from 'lucide-react'
 import { useSearchProperties } from '../../hooks/useProperties'
 import PropertyCard from '../../components/shared/PropertyCard'
+import CategoryBar from '../../components/shared/CategoryBar'
 
 // Skeleton de card mientras carga — mismo tamaño que PropertyCard
 const PropertyCardSkeleton = () => (
@@ -27,6 +28,7 @@ export default function HomePage() {
     checkOut: '',
     capacity: '',
   })
+  const [activeCategory, setActiveCategory] = useState('all')
 
   // Carga propiedades sin filtros para el listado de la home
   const { data: searchResult, isLoading } = useSearchProperties({})
@@ -126,6 +128,9 @@ export default function HomePage() {
           </form>
         </div>
       </section>
+
+      {/* Barra de categorías */}
+      <CategoryBar onChange={setActiveCategory} />
 
       {/* Sección listado de propiedades */}
       <section className="max-w-7xl mx-auto px-4 py-12">
