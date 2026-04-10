@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Search, SlidersHorizontal } from 'lucide-react'
 import { useSearchProperties } from '../../hooks/useProperties'
 import PropertyCard from '../../components/shared/PropertyCard'
 import type { SearchPropertiesRequest } from '../../types/property.types'
@@ -80,7 +81,7 @@ export default function SearchPage() {
           placeholder="Ciudad, país..."
           value={draft.location ?? ''}
           onChange={(e) => setDraft({ ...draft, location: e.target.value || undefined })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coral/30"
         />
       </div>
 
@@ -92,7 +93,7 @@ export default function SearchPage() {
           type="date"
           value={draft.checkIn ?? ''}
           onChange={(e) => setDraft({ ...draft, checkIn: e.target.value || undefined })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coral/30"
         />
       </div>
 
@@ -104,7 +105,7 @@ export default function SearchPage() {
           type="date"
           value={draft.checkOut ?? ''}
           onChange={(e) => setDraft({ ...draft, checkOut: e.target.value || undefined })}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coral/30"
         />
       </div>
 
@@ -120,7 +121,7 @@ export default function SearchPage() {
           onChange={(e) =>
             setDraft({ ...draft, capacity: e.target.value ? Number(e.target.value) : undefined })
           }
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coral/30"
         />
       </div>
 
@@ -137,7 +138,7 @@ export default function SearchPage() {
             onChange={(e) =>
               setDraft({ ...draft, minPrice: e.target.value ? Number(e.target.value) : undefined })
             }
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coral/30"
           />
         </div>
         <div>
@@ -152,14 +153,14 @@ export default function SearchPage() {
             onChange={(e) =>
               setDraft({ ...draft, maxPrice: e.target.value ? Number(e.target.value) : undefined })
             }
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coral/30"
           />
         </div>
       </div>
 
       <button
         onClick={applyFilters}
-        className="w-full bg-[#1e3a5f] hover:bg-[#16304f] text-white font-semibold py-2 rounded-lg text-sm transition-colors"
+        className="w-full bg-coral hover:bg-coral-dark text-white font-semibold py-2 rounded-lg text-sm transition-colors text-center cursor-pointer"
       >
         Aplicar filtros
       </button>
@@ -177,12 +178,12 @@ export default function SearchPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Botón filtros en móvil */}
         <div className="flex items-center justify-between mb-6 md:hidden">
-          <h1 className="text-xl font-bold text-[#1e3a5f]">Resultados</h1>
+          <h1 className="text-xl font-bold text-dark">Resultados</h1>
           <button
             onClick={() => setFiltersOpen(!filtersOpen)}
             className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-700"
           >
-            <span>⚙️</span> Filtros
+            <SlidersHorizontal className="h-4 w-4" /> Filtros
           </button>
         </div>
 
@@ -195,7 +196,7 @@ export default function SearchPage() {
             />
             <div className="relative ml-auto w-72 bg-white h-full shadow-xl p-6 overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-bold text-[#1e3a5f] text-lg">Filtros</h2>
+              <h2 className="font-bold text-dark text-lg">Filtros</h2>
                 <button
                   onClick={() => setFiltersOpen(false)}
                   className="text-gray-400 hover:text-gray-600 text-xl"
@@ -212,7 +213,7 @@ export default function SearchPage() {
           {/* Sidebar de filtros — desktop */}
           <aside className="hidden md:block w-64 shrink-0">
             <div className="bg-white rounded-xl shadow-sm p-5 sticky top-24">
-              <h2 className="font-bold text-[#1e3a5f] text-base mb-4">Filtros</h2>
+              <h2 className="font-bold text-dark text-base mb-4">Filtros</h2>
               <FilterPanel />
             </div>
           </aside>
@@ -239,7 +240,7 @@ export default function SearchPage() {
             {/* Estado vacío */}
             {!isLoading && properties.length === 0 && (
               <div className="text-center py-20 text-gray-400">
-                <p className="text-5xl mb-4">🔍</p>
+                <Search className="h-16 w-16 mx-auto text-gray-200 mb-4" />
                 <p className="text-lg font-medium">No se encontraron propiedades</p>
                 <p className="text-sm mt-1">Prueba ajustando los filtros de búsqueda</p>
               </div>

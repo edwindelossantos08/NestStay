@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { MapPin, User, Users, DollarSign, Home } from 'lucide-react'
 import { usePropertyById, usePropertyReviews } from '../../hooks/useProperties'
 import { useCreateBooking } from '../../hooks/useBookings'
 import { useAuth } from '../../context/AuthContext'
@@ -8,6 +9,7 @@ import { authApi } from '../../api/auth.api'
 import PropertyImage from '../../components/shared/PropertyImage'
 import StarRating from '../../components/shared/StarRating'
 import Modal from '../../components/ui/Modal'
+import DateRangePicker from '../../components/shared/DateRangePicker'
 import { formatPrice, calculateNights, timeAgo } from '../../utils/formatters'
 
 // Card individual de reseña
@@ -19,7 +21,7 @@ const ReviewCard = ({
   <div className="border border-gray-100 rounded-xl p-4 flex flex-col gap-2">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-[#1e3a5f] flex items-center justify-center text-white text-xs font-bold uppercase">
+        <div className="w-8 h-8 rounded-full bg-dark flex items-center justify-center text-white text-xs font-bold uppercase">
           {review.guestName.charAt(0)}
         </div>
         <span className="font-medium text-gray-800 text-sm">{review.guestName}</span>
@@ -70,9 +72,9 @@ export default function PropertyDetailPage() {
   if (isError || !property) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
-        <p className="text-5xl mb-4">🏠</p>
+        <Home className="h-16 w-16 text-gray-300 mb-4" />
         <h2 className="text-xl font-bold text-gray-700">Propiedad no encontrada</h2>
-        <Link to="/" className="mt-4 text-[#1e3a5f] underline text-sm">
+        <Link to="/" className="mt-4 text-coral underline text-sm">
           Volver al inicio
         </Link>
       </div>
@@ -142,7 +144,7 @@ export default function PropertyDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9fafb]">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Imagen hero */}
         <div className="relative w-full h-72 md:h-96 rounded-2xl overflow-hidden mb-8">
@@ -158,7 +160,10 @@ export default function PropertyDetailPage() {
           {/* Título encima de la imagen */}
           <div className="absolute bottom-4 left-6 text-white">
             <h1 className="text-3xl font-bold drop-shadow">{property.title}</h1>
-            <p className="text-white/80 mt-0.5">📍 {property.location}</p>
+            <p className="text-white/80 mt-0.5 flex items-center gap-1">
+              <MapPin className="h-4 w-4 shrink-0" />
+              {property.location}
+            </p>
           </div>
         </div>
 
@@ -169,15 +174,15 @@ export default function PropertyDetailPage() {
             {/* Info general */}
             <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <span>👤</span> Host: <strong className="text-gray-700 ml-1">{property.hostName}</strong>
+                <span className="flex items-center gap-1.5">
+                  <User className="h-4 w-4 shrink-0" /> Host: <strong className="text-dark ml-1">{property.hostName}</strong>
                 </span>
-                <span className="flex items-center gap-1">
-                  <span>👥</span> {property.capacity} {property.capacity === 1 ? 'persona' : 'personas'}
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4 shrink-0" /> {property.capacity} {property.capacity === 1 ? 'persona' : 'personas'}
                 </span>
-                <span className="flex items-center gap-1">
-                  <span>💰</span>
-                  <strong className="text-[#1e3a5f]">{formatPrice(property.pricePerNight)}</strong>
+                <span className="flex items-center gap-1.5">
+                  <DollarSign className="h-4 w-4 shrink-0" />
+                  <strong className="text-coral">{formatPrice(property.pricePerNight)}</strong>
                 </span>
               </div>
 
@@ -196,7 +201,7 @@ export default function PropertyDetailPage() {
 
               {/* Descripción */}
               <div>
-                <h2 className="font-semibold text-[#1e3a5f] mb-1">Descripción</h2>
+                <h2 className="font-semibold text-dark mb-1">Descripción</h2>
                 <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
                   {property.description}
                 </p>
@@ -205,7 +210,7 @@ export default function PropertyDetailPage() {
 
             {/* Sección de reseñas */}
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="font-semibold text-[#1e3a5f] text-lg mb-4">
+              <h2 className="font-semibold text-dark text-lg mb-4">
                 Reseñas {reviews.length > 0 && `(${reviews.length})`}
               </h2>
 
@@ -225,15 +230,15 @@ export default function PropertyDetailPage() {
           <div className="lg:col-span-1">
             {isHost ? (
               // El host ve un badge en lugar del card de reserva
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center border-2 border-[#c9a84c]/40">
-                <p className="text-2xl mb-2">🏠</p>
-                <p className="font-semibold text-[#1e3a5f]">Esta es tu propiedad</p>
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center border-2 border-coral/20">
+                <Home className="h-10 w-10 text-coral mx-auto mb-2" />
+                <p className="font-semibold text-dark">Esta es tu propiedad</p>
                 <p className="text-sm text-gray-500 mt-1">
                   Gestiona disponibilidad y reservas desde tu panel.
                 </p>
                 <Link
                   to={`/host/properties/${property.id}/availability`}
-                  className="mt-4 block text-center text-sm text-[#1e3a5f] underline"
+                  className="mt-4 block text-center text-sm text-coral underline"
                 >
                   Ver disponibilidad
                 </Link>
@@ -241,51 +246,33 @@ export default function PropertyDetailPage() {
             ) : (
               // Card de reserva para guests y usuarios no autenticados
               <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24 flex flex-col gap-4">
-                <p className="text-2xl font-bold text-[#1e3a5f]">
+                <p className="text-2xl font-bold text-dark">
                   {formatPrice(property.pricePerNight)}
+                  <span className="text-base font-normal text-gray-500"> / noche</span>
                 </p>
 
-                <div className="flex flex-col gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                      Check-in
-                    </label>
-                    <input
-                      type="date"
-                      min={today}
-                      value={checkIn}
-                      onChange={(e) => {
-                        setCheckIn(e.target.value)
-                        // Limpia check-out si queda antes del nuevo check-in
-                        if (checkOut && e.target.value >= checkOut) setCheckOut('')
-                      }}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                      Check-out
-                    </label>
-                    <input
-                      type="date"
-                      min={checkIn || today}
-                      value={checkOut}
-                      onChange={(e) => setCheckOut(e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
-                    />
-                  </div>
-                </div>
+                {/* Date Picker visual */}
+                <DateRangePicker
+                  checkIn={checkIn}
+                  checkOut={checkOut}
+                  minDate={today}
+                  onCheckInChange={(val) => {
+                    setCheckIn(val)
+                    if (checkOut && val >= checkOut) setCheckOut('')
+                  }}
+                  onCheckOutChange={setCheckOut}
+                />
 
                 {/* Resumen del total */}
                 {total !== null && nights > 0 && (
-                  <div className="bg-[#f9fafb] rounded-lg p-3 text-sm flex flex-col gap-1">
+                  <div className="bg-gray-50 rounded-lg p-3 text-sm flex flex-col gap-1">
                     <div className="flex justify-between text-gray-600">
                       <span>
                         ${property.pricePerNight} × {nights} {nights === 1 ? 'noche' : 'noches'}
                       </span>
                       <span>${total.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between font-bold text-[#1e3a5f] pt-1 border-t border-gray-200">
+                    <div className="flex justify-between font-bold text-dark pt-1 border-t border-gray-200">
                       <span>Total</span>
                       <span>${total.toFixed(2)}</span>
                     </div>
@@ -295,7 +282,7 @@ export default function PropertyDetailPage() {
                 <button
                   onClick={handleBooking}
                   disabled={booking}
-                  className="w-full bg-[#c9a84c] hover:bg-[#b8963e] text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-60"
+                  className="w-full bg-coral hover:bg-coral-dark text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60"
                 >
                   {booking
                     ? 'Reservando...'
@@ -306,11 +293,11 @@ export default function PropertyDetailPage() {
 
                 {!isAuthenticated && (
                   <p className="text-xs text-center text-gray-400">
-                    <Link to="/login" className="text-[#1e3a5f] underline">
+                    <Link to="/login" className="text-coral underline">
                       Inicia sesión
                     </Link>{' '}
                     o{' '}
-                    <Link to="/register" className="text-[#1e3a5f] underline">
+                    <Link to="/register" className="text-coral underline">
                       regístrate
                     </Link>{' '}
                     para hacer una reserva
@@ -342,7 +329,7 @@ export default function PropertyDetailPage() {
           <button
             onClick={handleAssignGuestRole}
             disabled={assigningRole}
-            className="flex-1 bg-[#1e3a5f] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#163152] transition-colors disabled:opacity-60"
+            className="flex-1 bg-coral text-white py-2 rounded-xl text-sm font-semibold hover:bg-coral-dark transition-colors disabled:opacity-60"
           >
             {assigningRole ? 'Activando...' : 'Activar rol huésped'}
           </button>

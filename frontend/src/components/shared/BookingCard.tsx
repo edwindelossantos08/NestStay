@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { Home, MapPin, Calendar, Moon, DollarSign, CheckCircle, Star } from 'lucide-react'
 import type { BookingResponse } from '../../types/booking.types'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
@@ -41,16 +42,20 @@ export default function BookingCard({
       {/* Header: título y badge de estado */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="min-w-0">
-          <h3 className="font-semibold text-[#1e3a5f] text-base flex items-center gap-2">
-            🏠 {booking.propertyTitle}
+          <h3 className="font-semibold text-dark text-base flex items-center gap-2">
+            <Home className="h-4 w-4 text-coral shrink-0" />
+            {booking.propertyTitle}
           </h3>
-          <p className="text-sm text-gray-500 mt-0.5">
-            📍 {booking.propertyLocation}
+          <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            {booking.propertyLocation}
           </p>
         </div>
         <div className="shrink-0">
           {booking.status === 'Confirmed' && (
-            <Badge variant="confirmed">Confirmada ✅</Badge>
+            <Badge variant="confirmed" className="flex items-center gap-1">
+              <CheckCircle className="h-3 w-3" /> Confirmada
+            </Badge>
           )}
           {booking.status === 'Cancelled' && (
             <Badge variant="cancelled">Cancelada</Badge>
@@ -65,22 +70,21 @@ export default function BookingCard({
 
       {/* Detalles de fechas y precio */}
       <div className="flex flex-col gap-1.5 text-sm text-gray-600">
-        <p>
-          📅 Entrada:{' '}
-          <span className="font-medium">{formatShortDate(booking.checkIn)}</span>
+        <p className="flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          Entrada: <span className="font-medium">{formatShortDate(booking.checkIn)}</span>
         </p>
-        <p>
-          📅 Salida:{' '}
-          <span className="font-medium">{formatShortDate(booking.checkOut)}</span>
+        <p className="flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          Salida: <span className="font-medium">{formatShortDate(booking.checkOut)}</span>
         </p>
-        <p>
-          🌙 {nights} {nights === 1 ? 'noche' : 'noches'}
+        <p className="flex items-center gap-1.5">
+          <Moon className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          {nights} {nights === 1 ? 'noche' : 'noches'}
         </p>
-        <p>
-          💰 Total:{' '}
-          <span className="font-semibold text-[#1e3a5f]">
-            ${booking.totalPrice.toFixed(2)}
-          </span>
+        <p className="flex items-center gap-1.5">
+          <DollarSign className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          Total: <span className="font-semibold text-dark">${booking.totalPrice.toFixed(2)}</span>
         </p>
       </div>
 
@@ -115,8 +119,10 @@ export default function BookingCard({
                 variant="secondary"
                 size="sm"
                 onClick={() => onReview(booking)}
+                className="flex items-center gap-1.5"
               >
-                Dejar reseña ⭐
+                <Star className="h-4 w-4" />
+                Dejar reseña
               </Button>
             )}
           </div>

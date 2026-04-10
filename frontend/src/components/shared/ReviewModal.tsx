@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Home, Calendar } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { BookingResponse } from '../../types/booking.types'
@@ -79,9 +80,9 @@ export default function ReviewModal({ isOpen, onClose, booking }: ReviewModalPro
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           {/* Resumen de la reserva */}
           <div className="bg-gray-50 rounded-lg p-3 flex flex-col gap-1 text-sm">
-            <p className="font-medium text-gray-800">🏠 {booking.propertyTitle}</p>
+            <p className="font-medium text-gray-800 flex items-center gap-1.5"><Home className="h-4 w-4 text-coral" /> {booking.propertyTitle}</p>
             <p className="text-gray-500">
-              📅 {fmtShort(booking.checkIn)} – {fmtShort(booking.checkOut)}{' '}
+              <Calendar className="h-3.5 w-3.5 text-gray-400" /> {fmtShort(booking.checkIn)} – {fmtShort(booking.checkOut)}{' '}
               {new Date(booking.checkOut).getFullYear()}
             </p>
           </div>

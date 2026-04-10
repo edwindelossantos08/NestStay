@@ -16,9 +16,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
           {
-            'bg-navy text-white hover:bg-navy-dark focus-visible:ring-navy': variant === 'primary',
-            'bg-gold text-white hover:bg-gold-dark focus-visible:ring-gold': variant === 'secondary',
-            'border-2 border-navy bg-transparent text-navy hover:bg-navy hover:text-white focus-visible:ring-navy': variant === 'outline',
+            'bg-coral text-white hover:bg-coral-dark focus-visible:ring-coral': variant === 'primary',
+            'bg-dark text-white hover:bg-[#111111] focus-visible:ring-dark': variant === 'secondary',
+            'border-2 border-coral bg-transparent text-coral hover:bg-coral hover:text-white focus-visible:ring-coral': variant === 'outline',
             'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600': variant === 'danger',
           },
           {

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { MapPin, Users } from 'lucide-react'
 import type { PropertyResponse } from '../../types/property.types'
 import { formatPrice } from '../../utils/formatters'
 import PropertyImage from './PropertyImage'
@@ -10,9 +11,12 @@ interface PropertyCardProps {
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
   return (
-    <div className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
-      {/* Imagen con efecto zoom en hover */}
-      <div className="relative h-48 overflow-hidden rounded-t-xl group">
+    <Link
+      to={`/properties/${property.id}`}
+      className="group block rounded-xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+    >
+      {/* Imagen con aspect-ratio cuadrado */}
+      <div className="relative aspect-square overflow-hidden rounded-xl">
         <PropertyImage
           imageUrl={property.imageUrl}
           title={property.title}
@@ -20,60 +24,44 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           variant="card"
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        {/* Overlay sutil en hover */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
       </div>
 
       {/* Contenido */}
-      <div className="flex flex-col flex-1 p-4 gap-2">
-        {/* Rating */}
-        <div className="flex items-center gap-1.5">
-          {property.averageRating > 0 ? (
-            <>
-              <StarRating rating={property.averageRating} size="sm" />
-              <span className="text-sm text-gray-500">
-                ({property.totalReviews} {property.totalReviews === 1 ? 'reseña' : 'reseñas'})
+      <div className="flex flex-col gap-1 pt-3">
+        {/* Título + Rating en la misma fila */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-dark line-clamp-1 text-sm leading-tight flex-1">
+            {property.title}
+          </h3>
+          {property.averageRating > 0 && (
+            <div className="flex items-center gap-0.5 shrink-0">
+              <StarRating rating={property.averageRating} size="sm" maxStars={1} />
+              <span className="text-xs font-medium text-dark">
+                {property.averageRating.toFixed(1)}
               </span>
-            </>
-          ) : (
-            <span className="text-sm text-gray-400">Sin reseñas</span>
+            </div>
           )}
         </div>
 
-        {/* Título */}
-        <h3 className="font-semibold text-[#1e3a5f] line-clamp-2 leading-tight">
-          {property.title}
-        </h3>
-
         {/* Ubicación */}
         <p className="text-sm text-gray-500 flex items-center gap-1">
-          <span>📍</span>
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
           {property.location}
         </p>
 
         {/* Capacidad */}
         <p className="text-sm text-gray-500 flex items-center gap-1">
-          <span>👥</span>
-          Capacidad: {property.capacity} {property.capacity === 1 ? 'persona' : 'personas'}
+          <Users className="h-3.5 w-3.5 shrink-0" />
+          {property.capacity} {property.capacity === 1 ? 'persona' : 'personas'}
         </p>
-
-        {/* Espaciador */}
-        <div className="flex-1" />
 
         {/* Precio */}
-        <p className="text-[#1e3a5f] font-bold text-base">
-          {formatPrice(property.pricePerNight)}
+        <p className="text-sm text-dark font-semibold mt-0.5">
+          <span className="font-bold">{formatPrice(property.pricePerNight)}</span>
+          <span className="font-normal text-gray-500"> noche</span>
         </p>
-
-        {/* CTA */}
-        <Link
-          to={`/properties/${property.id}`}
-          className="block text-center bg-[#1e3a5f] hover:bg-[#16304f] text-white text-sm font-medium py-2 rounded-lg transition-colors duration-200"
-        >
-          Ver propiedad
-        </Link>
       </div>
-    </div>
+    </Link>
   )
 }
 

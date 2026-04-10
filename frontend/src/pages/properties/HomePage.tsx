@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Users, Home } from 'lucide-react'
 import { useSearchProperties } from '../../hooks/useProperties'
 import PropertyCard from '../../components/shared/PropertyCard'
 
@@ -43,9 +44,9 @@ export default function HomePage() {
   const properties = searchResult?.properties ?? []
 
   return (
-    <div className="min-h-screen bg-[#f9fafb]">
+    <div className="min-h-screen bg-white">
       {/* Sección hero con buscador */}
-      <section className="bg-gradient-to-br from-[#1e3a5f] to-[#162c4a] py-20 px-4">
+      <section className="bg-gradient-to-br from-dark to-[#111] py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
             Encuentra tu lugar perfecto
@@ -102,8 +103,8 @@ export default function HomePage() {
 
               {/* Huéspedes */}
               <div className="flex flex-col gap-1 text-left">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  👥 Huéspedes
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5" /> Huéspedes
                 </label>
                 <input
                   type="number"
@@ -118,7 +119,7 @@ export default function HomePage() {
 
             <button
               type="submit"
-              className="mt-4 w-full md:w-auto md:px-12 bg-[#c9a84c] hover:bg-[#b8963e] text-white font-semibold py-2.5 px-8 rounded-xl transition-colors duration-200"
+              className="mt-4 w-full md:w-auto md:px-12 bg-coral hover:bg-coral-dark text-white font-semibold py-2.5 px-8 rounded-xl transition-colors duration-200"
             >
               Buscar
             </button>
@@ -128,7 +129,7 @@ export default function HomePage() {
 
       {/* Sección listado de propiedades */}
       <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6">
+        <h2 className="text-2xl font-bold text-dark mb-6">
           Propiedades disponibles
         </h2>
 
@@ -145,7 +146,7 @@ export default function HomePage() {
         {/* Estado vacío */}
         {!isLoading && properties.length === 0 && (
           <div className="text-center py-20 text-gray-400">
-            <p className="text-5xl mb-4">🏠</p>
+            <Home className="h-16 w-16 mx-auto text-gray-200 mb-4" />
             <p className="text-lg font-medium">No hay propiedades disponibles</p>
             <p className="text-sm mt-1">Vuelve pronto, ¡se están agregando más!</p>
           </div>

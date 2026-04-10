@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link } from 'react-router-dom'
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, Home } from 'lucide-react'
 import { useRegister } from '../../hooks/useAuth'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -67,7 +67,7 @@ export default function RegisterPage() {
           <p className="mt-3 text-gray-600">
             Te enviamos un enlace de confirmación a:
           </p>
-          <p className="mt-1 font-semibold text-navy">{registeredEmail}</p>
+          <p className="mt-1 font-semibold text-coral">{registeredEmail}</p>
           <p className="mt-3 text-sm text-gray-500">
             Haz clic en el enlace del correo para activar tu cuenta antes de iniciar sesión.
           </p>
@@ -88,8 +88,8 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Logo y título */}
         <div className="mb-8 text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-3xl font-bold text-navy">
-            🏠 NestStay
+          <Link to="/" className="inline-flex items-center gap-2 text-3xl font-bold text-coral">
+            <Home className="h-8 w-8" /> NestStay
           </Link>
           <p className="mt-2 text-gray-500">Crea tu cuenta gratis</p>
         </div>
@@ -193,7 +193,7 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             ¿Ya tienes cuenta?{' '}
-            <Link to="/login" className="font-medium text-navy hover:text-gold">
+            <Link to="/login" className="font-medium text-coral hover:text-coral-dark">
               Inicia sesión aquí
             </Link>
           </p>

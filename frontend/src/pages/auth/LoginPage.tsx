@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Home } from 'lucide-react'
 import { useLogin } from '../../hooks/useAuth'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -58,8 +58,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo y título */}
         <div className="mb-8 text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-3xl font-bold text-navy">
-            🏠 NestStay
+          <Link to="/" className="inline-flex items-center gap-2 text-3xl font-bold text-coral">
+            <Home className="h-8 w-8" /> NestStay
           </Link>
           <p className="mt-2 text-gray-500">Bienvenido de nuevo</p>
         </div>
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             ¿No tienes cuenta?{' '}
-            <Link to="/register" className="font-medium text-navy hover:text-gold">
+            <Link to="/register" className="font-medium text-coral hover:text-coral-dark">
               Regístrate aquí
             </Link>
           </p>

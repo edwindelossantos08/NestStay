@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Calendar } from 'lucide-react'
 import type { BookingStatus, BookingResponse } from '../../types/booking.types'
 import { useMyBookings, useCancelBooking, useCompleteBooking } from '../../hooks/useBookings'
 import { useToast } from '../../context/ToastContext'
@@ -61,7 +62,7 @@ export default function MyBookingsPage() {
   return (
     <div className="min-h-screen bg-[#f9fafb]">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-[#1e3a5f] mb-6">Mis reservas</h1>
+        <h1 className="text-2xl font-bold text-dark mb-6">Mis reservas</h1>
 
         {/* Tabs de filtro por estado */}
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit overflow-x-auto">
@@ -71,7 +72,7 @@ export default function MyBookingsPage() {
               onClick={() => setSelectedTab(tab.value)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedTab === tab.value
-                  ? 'bg-white text-[#1e3a5f] shadow-sm'
+                  ? 'bg-white text-dark shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -89,7 +90,7 @@ export default function MyBookingsPage() {
           <ErrorMessage message="No se pudieron cargar tus reservas." />
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-4xl mb-4">📅</p>
+            <Calendar className="h-16 w-16 mx-auto text-gray-200 mb-4" />
             <p className="text-gray-600 font-medium">{EMPTY_MESSAGES[selectedTab]}</p>
             <Button
               variant="primary"

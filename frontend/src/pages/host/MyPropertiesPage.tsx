@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Home, MapPin, Star, Users } from 'lucide-react'
 import { useMyProperties, useDeleteProperty } from '../../hooks/useProperties'
 import { useToast } from '../../context/ToastContext'
 import PropertyImage from '../../components/shared/PropertyImage'
@@ -32,14 +33,14 @@ export default function MyPropertiesPage() {
       {/* Encabezado */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1e3a5f]">Mis propiedades</h1>
+          <h1 className="text-2xl font-bold text-dark">Mis propiedades</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             Gestiona tus alojamientos
           </p>
         </div>
         <Link
           to="/host/properties/new"
-          className="bg-[#c9a84c] hover:bg-[#b8963e] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+          className="bg-coral hover:bg-coral-dark text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
         >
           + Nueva propiedad
         </Link>
@@ -57,7 +58,7 @@ export default function MyPropertiesPage() {
       {/* Estado vacío */}
       {!isLoading && properties.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-xl shadow-sm">
-          <p className="text-5xl mb-4">🏠</p>
+          <Home className="h-16 w-16 mx-auto text-gray-200 mb-4" />
           <h2 className="text-lg font-semibold text-gray-700">
             Aún no tienes propiedades
           </h2>
@@ -66,7 +67,7 @@ export default function MyPropertiesPage() {
           </p>
           <Link
             to="/host/properties/new"
-            className="bg-[#1e3a5f] text-white text-sm px-5 py-2.5 rounded-xl hover:bg-[#163152] transition-colors"
+            className="bg-coral text-white text-sm px-5 py-2.5 rounded-xl hover:bg-coral-dark transition-colors"
           >
             + Crear propiedad
           </Link>
@@ -99,19 +100,21 @@ export default function MyPropertiesPage() {
                     {property.title}
                   </h3>
                   {property.averageRating > 0 && (
-                    <span className="text-xs text-[#c9a84c] font-bold shrink-0">
-                      ⭐ {property.averageRating.toFixed(1)}
+                    <span className="flex items-center gap-0.5 text-xs text-coral font-bold shrink-0">
+                      <Star className="h-3 w-3" /> {property.averageRating.toFixed(1)}
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-gray-500">📍 {property.location}</p>
+                <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="h-3 w-3" /> {property.location}</p>
 
                 <div className="flex items-center gap-3 text-xs text-gray-500">
                   <span>
                     ${property.pricePerNight.toLocaleString('es-DO')}/noche
                   </span>
-                  <span>👥 {property.capacity} personas</span>
+                  <span className="flex items-center gap-1">
+                    <Users className="h-3 w-3" /> {property.capacity} personas
+                  </span>
                 </div>
 
                 {/* Acciones */}
@@ -119,13 +122,13 @@ export default function MyPropertiesPage() {
                   <div className="flex gap-2">
                     <Link
                       to={`/host/properties/${property.id}/edit`}
-                      className="flex-1 text-center text-xs bg-[#1e3a5f] text-white px-2 py-2 rounded-lg hover:bg-[#163152] transition-colors font-medium"
+                      className="flex-1 text-center text-xs bg-coral text-white px-2 py-2 rounded-lg hover:bg-coral-dark transition-colors font-medium"
                     >
                       Editar
                     </Link>
                     <Link
                       to={`/host/properties/${property.id}/availability`}
-                      className="flex-1 text-center text-xs border border-[#1e3a5f] text-[#1e3a5f] px-2 py-2 rounded-lg hover:bg-[#1e3a5f]/5 transition-colors font-medium"
+                      className="flex-1 text-center text-xs border border-coral text-coral px-2 py-2 rounded-lg hover:bg-coral/5 transition-colors font-medium"
                     >
                       Disponibilidad
                     </Link>

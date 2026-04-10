@@ -30,7 +30,7 @@ const StarRating = ({
         return (
           <span
             key={i}
-            className={`${starSize} ${filled ? 'text-[#c9a84c]' : 'text-gray-300'} ${
+            className={`${starSize} ${filled ? 'text-coral' : 'text-gray-300'} ${
               interactive ? 'cursor-pointer transition-colors duration-100' : ''
             }`}
             onMouseEnter={() => interactive && setHovered(value)}
