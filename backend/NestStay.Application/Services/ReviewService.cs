@@ -55,10 +55,10 @@ public class ReviewService : IReviewService
         await _uow.Reviews.AddAsync(review);
         await _uow.CommitAsync();
 
-        // Cargar el guest para incluir su nombre en la respuesta
+        // Cargar el guest para incluir su nombre y avatar en la respuesta
         var guest = await _uow.Users.GetByIdAsync(guestId);
 
-        return MapToResponse(review, guest!.Name);
+        return MapToResponse(review, guest!.Name, guest.AvatarUrl);
     }
 
     public async Task<PropertyReviewsResponse> GetByPropertyAsync(int propertyId)
@@ -80,19 +80,21 @@ public class ReviewService : IReviewService
             PropertyTitle = property.Title,
             AverageRating = avgRating,
             TotalReviews  = reviewList.Count,
-            Reviews       = reviewList.Select(r => MapToResponse(r, r.Guest!.Name)).ToList()
+            Reviews       = reviewList.Select(r => MapToResponse(r, r.Guest!.Name, r.Guest.AvatarUrl)).ToList()
         };
     }
 
-    private static ReviewResponse MapToResponse(Review review, string guestName) =>
+    private static ReviewResponse MapToResponse(Review review, string guestName, string? guestAvatarUrl = null) =>
         new ReviewResponse
         {
-            Id         = review.Id,
-            BookingId  = review.BookingId,
-            PropertyId = review.PropertyId,
-            GuestName  = guestName,
-            Rating     = review.Rating,
-            Comment    = review.Comment,
-            CreatedAt  = review.CreatedAt
+            Id             = review.Id,
+            BookingId      = review.BookingId,
+            PropertyId     = review.PropertyId,
+            GuestName      = guestName,
+            // Incluir avatar del guest
+            GuestAvatarUrl = guestAvatarUrl,
+            Rating         = review.Rating,
+            Comment        = review.Comment,
+            CreatedAt      = review.CreatedAt
         };
 }

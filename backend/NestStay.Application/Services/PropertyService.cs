@@ -189,13 +189,15 @@ public class PropertyService : IPropertyService
             .Take(5)
             .Select(r => new ReviewResponse
             {
-                Id         = r.Id,
-                BookingId  = r.BookingId,
-                PropertyId = r.PropertyId,
-                GuestName  = r.Guest!.Name,
-                Rating     = r.Rating,
-                Comment    = r.Comment,
-                CreatedAt  = r.CreatedAt
+                Id             = r.Id,
+                BookingId      = r.BookingId,
+                PropertyId     = r.PropertyId,
+                GuestName      = r.Guest!.Name,
+                // Incluir avatar del guest en las últimas reseñas
+                GuestAvatarUrl = r.Guest.AvatarUrl,
+                Rating         = r.Rating,
+                Comment        = r.Comment,
+                CreatedAt      = r.CreatedAt
             })
             .ToList();
 
@@ -415,8 +417,10 @@ public class PropertyService : IPropertyService
             Location      = property.Location,
             PricePerNight = property.PricePerNight,
             Capacity      = property.Capacity,
-            HostId        = property.HostId,
-            HostName      = host.Name,
+            HostId          = property.HostId,
+            HostName        = host.Name,
+            // Incluir avatar del host
+            HostAvatarUrl   = host.AvatarUrl,
             // Mantener ImageUrl apuntando a la primera imagen
             ImageUrl      = images.FirstOrDefault()?.Url ?? property.ImageUrl,
             Images        = images.Select(i => new PropertyImageResponse

@@ -57,10 +57,12 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 
 [sourceFiles]
 Entities/
+ Amenity.cs
  BlockedDate.cs
  Booking.cs
  Notification.cs
  Property.cs
+ PropertyAmenity.cs
  PropertyImage.cs
  Review.cs
  User.cs

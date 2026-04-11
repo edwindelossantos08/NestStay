@@ -7,6 +7,8 @@ interface AuthUser {
   userName: string
   email: string
   roles: string[]
+  // Avatar opcional para mostrar en navbar
+  avatarUrl?: string
 }
 
 interface AuthContextType {
@@ -17,6 +19,7 @@ interface AuthContextType {
   hasRole: (role: 'Host' | 'Guest') => boolean
   login: (loginResponse: LoginResponse) => void
   logout: () => void
+  updateUser: (updates: Partial<AuthUser>) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -38,8 +41,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authUser: AuthUser = {
       id: 0,
       userName: loginResponse.userName,
-      email: '',
+      email: loginResponse.email || '',
       roles: loginResponse.roles,
+      avatarUrl: loginResponse.avatarUrl
     }
     localStorage.setItem('neststay_token', loginResponse.token)
     localStorage.setItem('neststay_user', JSON.stringify(authUser))
@@ -55,6 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     navigate('/login')
   }
 
+  const updateUser = (updates: Partial<AuthUser>) => {
+    if (!user) return
+    const updatedUser = { ...user, ...updates }
+    localStorage.setItem('neststay_user', JSON.stringify(updatedUser))
+    setUser(updatedUser)
+  }
+
   const hasRole = (role: 'Host' | 'Guest'): boolean => {
     return user?.roles.includes(role) ?? false
   }
@@ -68,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasRole,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}

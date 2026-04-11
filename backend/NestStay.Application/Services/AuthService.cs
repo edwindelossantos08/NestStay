@@ -111,10 +111,12 @@ public class AuthService : IAuthService
 
         return new LoginResponse
         {
-            Token = token,
+            Token     = token,
             ExpiresAt = expiresAt,
-            UserName = user.Name,
-            Roles = roles
+            UserName  = user.Name,
+            Roles     = roles,
+            // Incluir avatar para el frontend
+            AvatarUrl = user.AvatarUrl
         };
     }
 
@@ -134,4 +136,44 @@ public class AuthService : IAuthService
         user.AddRole(request.Role);
         await _unitOfWork.CommitAsync();
     }
+
+    public async Task<UserProfileResponse> GetProfileAsync(int userId)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        // Si no existe lanzar NotFoundException
+        if (user is null)
+            throw new NotFoundException("Usuario no encontrado");
+
+        return MapToProfileResponse(user);
+    }
+
+    public async Task<UserProfileResponse> UpdateProfileAsync(int userId, UpdateProfileRequest request)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        if (user is null)
+            throw new NotFoundException("Usuario no encontrado");
+
+        // El nombre no puede estar vacío
+        if (string.IsNullOrWhiteSpace(request.Name))
+            throw new BusinessRuleException("El nombre no puede estar vacío");
+
+        user.Name = request.Name;
+        // AvatarUrl puede ser null para eliminar el avatar
+        user.AvatarUrl = request.AvatarUrl;
+
+        await _unitOfWork.CommitAsync();
+
+        return MapToProfileResponse(user);
+    }
+
+    private static UserProfileResponse MapToProfileResponse(User user) =>
+        new UserProfileResponse
+        {
+            Id        = user.Id,
+            Name      = user.Name,
+            Email     = user.Email,
+            AvatarUrl = user.AvatarUrl,
+            Roles     = user.GetRoles().ToList(),
+            CreatedAt = user.CreatedAt
+        };
 }

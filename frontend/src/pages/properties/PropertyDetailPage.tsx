@@ -10,7 +10,8 @@ import PropertyImage from '../../components/shared/PropertyImage'
 import StarRating from '../../components/shared/StarRating'
 import Modal from '../../components/ui/Modal'
 import DateRangePicker from '../../components/shared/DateRangePicker'
-import { formatPrice, calculateNights, timeAgo } from '../../utils/formatters'
+import UserAvatar from '../../components/shared/UserAvatar'
+import { formatPrice, calculateNights, timeAgo, formatDate } from '../../utils/formatters'
 
 const PropertyMap = React.lazy(() => import('../../components/shared/PropertyMap'))
 
@@ -18,20 +19,29 @@ const PropertyMap = React.lazy(() => import('../../components/shared/PropertyMap
 const ReviewCard = ({
   review,
 }: {
-  review: { id: number; guestName: string; rating: number; comment: string; createdAt: string }
+  review: { id: number; guestName: string; rating: number; comment: string; createdAt: string; guestAvatarUrl?: string }
 }) => (
-  <div className="border border-gray-100 rounded-xl p-4 flex flex-col gap-2">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-dark flex items-center justify-center text-white text-xs font-bold uppercase">
-          {review.guestName.charAt(0)}
-        </div>
-        <span className="font-medium text-gray-800 text-sm">{review.guestName}</span>
+  <div className="flex items-start gap-3 py-4 border-b border-gray-100 last:border-0">
+    <UserAvatar
+      name={review.guestName}
+      avatarUrl={review.guestAvatarUrl}
+      size="sm"
+    />
+    <div className="flex-1">
+      <div className="flex items-center justify-between">
+        <span className="font-medium text-gray-900 text-sm">
+          {review.guestName}
+        </span>
+        <span className="text-gray-400 text-xs">
+          {timeAgo(review.createdAt)}
+        </span>
       </div>
-      <span className="text-xs text-gray-400">{timeAgo(review.createdAt)}</span>
+      <div className="flex items-center gap-1 my-1">
+        {/* StarRating estático */}
+        <StarRating rating={review.rating} size="sm" />
+      </div>
+      <p className="text-gray-600 text-sm">{review.comment}</p>
     </div>
-    <StarRating rating={review.rating} size="sm" />
-    <p className="text-sm text-gray-600 leading-relaxed">{review.comment}</p>
   </div>
 )
 
@@ -177,9 +187,6 @@ export default function PropertyDetailPage() {
             <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1.5">
-                  <User className="h-4 w-4 shrink-0" /> Host: <strong className="text-dark ml-1">{property.hostName}</strong>
-                </span>
-                <span className="flex items-center gap-1.5">
                   <Users className="h-4 w-4 shrink-0" /> {property.capacity} {property.capacity === 1 ? 'persona' : 'personas'}
                 </span>
                 <span className="flex items-center gap-1.5">
@@ -227,10 +234,28 @@ export default function PropertyDetailPage() {
                   />
                 </React.Suspense>
 
-                {/* Igual que Airbnb — no muestra dirección exacta */}
                 <p className="text-sm text-gray-500 mt-3">
                   La dirección exacta se comparte tras confirmar la reserva.
                 </p>
+              </section>
+
+              {/* Sección del host con avatar */}
+              <section className="mt-8 pt-8 border-t border-gray-200">
+                <div className="flex items-center gap-4">
+                  <UserAvatar
+                    name={property.hostName}
+                    avatarUrl={property.hostAvatarUrl}
+                    size="lg"
+                  />
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Anfitrión: {property.hostName}
+                    </h2>
+                    <p className="text-gray-500 text-sm">
+                      Miembro desde {formatDate(property.createdAt)}
+                    </p>
+                  </div>
+                </div>
               </section>
             </div>
 

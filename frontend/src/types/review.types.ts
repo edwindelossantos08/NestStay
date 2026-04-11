@@ -3,6 +3,7 @@ export interface ReviewResponse {
   bookingId: number
   propertyId: number
   guestName: string
+  guestAvatarUrl?: string
   rating: number
   comment: string
   createdAt: string

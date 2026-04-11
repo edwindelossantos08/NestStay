@@ -8,6 +8,7 @@ import PropertyDetailPage from '../pages/properties/PropertyDetailPage'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import ConfirmAccountPage from '../pages/auth/ConfirmAccountPage'
+import ProfilePage from '../pages/auth/ProfilePage'
 import NotificationsPage from '../pages/notifications/NotificationsPage'
 import DashboardPage from '../pages/host/DashboardPage'
 import MyPropertiesPage from '../pages/host/MyPropertiesPage'
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: '/notifications', element: <NotificationsPage /> },
+          { path: '/profile', element: <ProfilePage /> },
         ],
       },
 

@@ -63,6 +63,8 @@ DTOs/Auth/
  LoginResponse.cs
  RegisterRequest.cs
  RegisterResponse.cs
+ UpdateProfileRequest.cs
+ UserProfileResponse.cs
 DTOs/Availability/
  AvailabilityCheckResponse.cs
  AvailabilityResponse.cs

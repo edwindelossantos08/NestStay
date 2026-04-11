@@ -1,30 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  Bell, Menu, X, Search, LayoutDashboard, CalendarCheck, LogOut,
+  Bell, Menu, X, Search, LayoutDashboard, CalendarCheck, LogOut, User,
 } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useAuth } from '../../hooks/useAuth'
 import { useNotifications } from '../../hooks/useNotifications'
 import Button from '../ui/Button'
+import UserAvatar from '../shared/UserAvatar'
 
-/** Up to 2 initials from a display name */
-const getInitials = (name?: string): string => {
-  if (!name) return '?'
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
-
-/** Deterministic avatar background based on first char */
-const AVATAR_COLORS = [
-  'bg-[#1e3a5f]', 'bg-[#c9a84c]', 'bg-[#2d6a4f]',
-  'bg-[#6d3a8a]', 'bg-[#c1440e]', 'bg-[#1a7fa1]',
-]
-const avatarColor = (name?: string): string => {
-  const idx = (name?.charCodeAt(0) ?? 0) % AVATAR_COLORS.length
-  return AVATAR_COLORS[idx]
-}
 
 export default function Navbar() {
   const { isAuthenticated, user, hasRole, logout } = useAuth()
@@ -96,13 +80,13 @@ export default function Navbar() {
               {/* Dropdown hamburguesa + avatar */}
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button className="flex items-center gap-2 rounded-full border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:shadow-md transition-shadow duration-200">
+                  <button className="flex items-center gap-2 rounded-full border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:shadow-md transition-shadow duration-200 outline-none">
                     <Menu className="h-4 w-4" />
-                    <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-white text-xs font-bold select-none ${avatarColor(user?.userName)}`}
-                    >
-                      {getInitials(user?.userName)}
-                    </div>
+                    <UserAvatar
+                      name={user?.userName || 'Usuario'}
+                      avatarUrl={user?.avatarUrl}
+                      size="sm"
+                    />
                   </button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
@@ -114,6 +98,13 @@ export default function Navbar() {
                     <div className="px-3 py-2 text-xs text-gray-400 font-medium border-b border-gray-100 mb-1">
                       {user?.userName}
                     </div>
+                    <DropdownMenu.Item
+                      onSelect={() => navigate('/profile')}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none"
+                    >
+                      <User className="h-4 w-4 text-gray-400" />
+                      Mi perfil
+                    </DropdownMenu.Item>
                     <DropdownMenu.Item
                       onSelect={() => navigate('/properties/search')}
                       className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 outline-none"

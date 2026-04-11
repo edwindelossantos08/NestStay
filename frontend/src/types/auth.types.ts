@@ -15,8 +15,23 @@ export interface LoginResponse {
   expiresAt: string
   userName: string
   roles: string[]
+  avatarUrl?: string
 }
 
 export interface AssignRoleRequest {
   role: string
+}
+
+export interface UserProfileResponse {
+  id: number
+  name: string
+  email: string
+  avatarUrl?: string
+  roles: string[]
+  createdAt: string
+}
+
+export interface UpdateProfileRequest {
+  name: string
+  avatarUrl?: string
 }

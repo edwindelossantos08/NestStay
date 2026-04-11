@@ -32,6 +32,9 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(u => u.ConfirmationToken).IsUnique();
             entity.Property(u => u.ConfirmationToken).IsRequired(false);
             entity.Property(u => u.Roles).HasDefaultValue("Guest");
+            entity.Property(u => u.AvatarUrl)
+                  .HasMaxLength(500)
+                  .IsRequired(false);
         });
 
         // --- Property ---
