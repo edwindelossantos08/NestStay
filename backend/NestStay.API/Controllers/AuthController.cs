@@ -47,4 +47,22 @@ public class AuthController : ControllerBase
         await _authService.AssignRoleAsync(userId, request);
         return Ok(ApiResponse<string>.Ok("Rol asignado exitosamente"));
     }
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var userId = User.GetUserId();
+        var result = await _authService.GetProfileAsync(userId);
+        return Ok(ApiResponse<UserProfileResponse>.Ok(result));
+    }
+
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        var userId = User.GetUserId();
+        var result = await _authService.UpdateProfileAsync(userId, request);
+        return Ok(ApiResponse<UserProfileResponse>.Ok(result));
+    }
 }

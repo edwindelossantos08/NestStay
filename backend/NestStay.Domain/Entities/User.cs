@@ -10,6 +10,8 @@ public class User
     public string? ConfirmationToken { get; set; }
     public DateTime? TokenExpiresAt { get; set; }
     public DateTime CreatedAt { get; set; }
+    // URL del avatar del usuario (opcional)
+    public string? AvatarUrl { get; set; }
     // Lista de roles separados por coma almacenados en BD
     public string Roles { get; set; } = "Guest";
 

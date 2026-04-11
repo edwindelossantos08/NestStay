@@ -13,6 +13,8 @@ public class PropertyResponse
     public int Capacity { get; set; }
     public int HostId { get; set; }
     public string HostName { get; set; } = null!;
+    // Avatar del host para mostrar en el detalle de la propiedad
+    public string? HostAvatarUrl { get; set; }
     // Lista de imágenes ordenadas por DisplayOrder
     public List<PropertyImageResponse> Images { get; set; } = new();
     // Mantener ImageUrl para compatibilidad con el frontend actual

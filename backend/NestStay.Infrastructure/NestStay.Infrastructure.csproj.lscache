@@ -68,12 +68,17 @@ Migrations/
  20260410234206_AddCoordinatesToProperty.Designer.cs
  20260411033433_AddPropertyImages.cs
  20260411033433_AddPropertyImages.Designer.cs
+ 20260411133840_AddAmenities.cs
+ 20260411133840_AddAmenities.Designer.cs
+ 20260411134445_AddAvatarUrlToUser.cs
+ 20260411134445_AddAvatarUrlToUser.Designer.cs
  ApplicationDbContextModelSnapshot.cs
 obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
  NestStay.Infrastructure.AssemblyInfo.cs
  NestStay.Infrastructure.GlobalUsings.g.cs
 Repositories/
+ AmenityRepository.cs
  BlockedDateRepository.cs
  BookingRepository.cs
  NotificationRepository.cs

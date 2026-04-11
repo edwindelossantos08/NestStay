@@ -6,4 +6,6 @@ public class LoginResponse
     public DateTime ExpiresAt { get; set; }
     public string UserName { get; set; } = string.Empty;
     public List<string> Roles { get; set; } = new();
+    // URL del avatar para mostrar en el navbar
+    public string? AvatarUrl { get; set; }
 }
