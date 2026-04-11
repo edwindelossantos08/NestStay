@@ -61,6 +61,7 @@ Entities/
  Booking.cs
  Notification.cs
  Property.cs
+ PropertyImage.cs
  Review.cs
  User.cs
 Enums/BookingStatus.cs

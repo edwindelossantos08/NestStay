@@ -20,6 +20,8 @@ public class Property
     public ICollection<Booking> Bookings { get; set; }
     public ICollection<BlockedDate> BlockedDates { get; set; }
     public ICollection<Review> Reviews { get; set; }
+    // Colección de imágenes de la propiedad
+    public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
 
     public Property()
     {
@@ -27,5 +29,6 @@ public class Property
         Bookings = new List<Booking>();
         BlockedDates = new List<BlockedDate>();
         Reviews = new List<Review>();
+        Images = new List<PropertyImage>();
     }
 }

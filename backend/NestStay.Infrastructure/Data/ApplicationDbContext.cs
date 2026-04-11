@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Property> Properties => Set<Property>();
+    public DbSet<PropertyImage> PropertyImages => Set<PropertyImage>();
     public DbSet<BlockedDate> BlockedDates => Set<BlockedDate>();
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<Review> Reviews => Set<Review>();
@@ -52,6 +53,29 @@ public class ApplicationDbContext : DbContext
                   .WithMany(u => u.Properties)
                   .HasForeignKey(p => p.HostId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // --- PropertyImage ---
+        modelBuilder.Entity<PropertyImage>(entity =>
+        {
+            entity.HasKey(pi => pi.Id);
+
+            entity.Property(pi => pi.Url)
+                  .HasMaxLength(500)
+                  .IsRequired();
+
+            // Orden de visualización, default 0
+            entity.Property(pi => pi.DisplayOrder)
+                  .HasDefaultValue(0);
+
+            entity.Property(pi => pi.CreatedAt)
+                  .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+            // Al eliminar la propiedad se eliminan sus imágenes
+            entity.HasOne(pi => pi.Property)
+                  .WithMany(p => p.Images)
+                  .HasForeignKey(pi => pi.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // --- BlockedDate ---

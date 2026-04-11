@@ -64,6 +64,10 @@ Migrations/
  20260401210913_InitialCreate.Designer.cs
  20260408010519_AddRolesToUser.cs
  20260408010519_AddRolesToUser.Designer.cs
+ 20260410234206_AddCoordinatesToProperty.cs
+ 20260410234206_AddCoordinatesToProperty.Designer.cs
+ 20260411033433_AddPropertyImages.cs
+ 20260411033433_AddPropertyImages.Designer.cs
  ApplicationDbContextModelSnapshot.cs
 obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
@@ -73,6 +77,7 @@ Repositories/
  BlockedDateRepository.cs
  BookingRepository.cs
  NotificationRepository.cs
+ PropertyImageRepository.cs
  PropertyRepository.cs
  Repository.cs
  ReviewRepository.cs

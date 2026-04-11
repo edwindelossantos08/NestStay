@@ -8,5 +8,6 @@ public interface IUnitOfWork
     IBlockedDateRepository BlockedDates { get; }
     IReviewRepository Reviews { get; }
     INotificationRepository Notifications { get; }
+    IPropertyImageRepository PropertyImages { get; }
     Task<int> CommitAsync();
 }

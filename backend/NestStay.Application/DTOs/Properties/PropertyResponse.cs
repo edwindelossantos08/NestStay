@@ -1,4 +1,5 @@
 using NestStay.Application.DTOs.Reviews;
+using NestStay.Application.DTOs.Properties;
 
 namespace NestStay.Application.DTOs.Properties;
 
@@ -12,7 +13,10 @@ public class PropertyResponse
     public int Capacity { get; set; }
     public int HostId { get; set; }
     public string HostName { get; set; } = null!;
-    // Incluida en la respuesta para que el frontend pueda mostrarla
+    // Lista de imágenes ordenadas por DisplayOrder
+    public List<PropertyImageResponse> Images { get; set; } = new();
+    // Mantener ImageUrl para compatibilidad con el frontend actual
+    // Apunta a la primera imagen de la colección si existe
     public string? ImageUrl { get; set; }
     public double AverageRating { get; set; }
     public int TotalReviews { get; set; }

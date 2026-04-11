@@ -78,6 +78,8 @@ DTOs/Notifications/
  NotificationResponse.cs
 DTOs/Properties/
  CreatePropertyRequest.cs
+ PropertyImageRequests.cs
+ PropertyImageResponse.cs
  PropertyResponse.cs
  SearchPropertiesRequest.cs
  SearchPropertiesResponse.cs
@@ -90,6 +92,7 @@ Interfaces/Repositories/
  IBlockedDateRepository.cs
  IBookingRepository.cs
  INotificationRepository.cs
+ IPropertyImageRepository.cs
  IPropertyRepository.cs
  IRepository.cs
  IReviewRepository.cs

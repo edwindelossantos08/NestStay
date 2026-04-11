@@ -13,6 +13,7 @@ public class UnitOfWork : IUnitOfWork
     public IBlockedDateRepository BlockedDates { get; }
     public IReviewRepository Reviews { get; }
     public INotificationRepository Notifications { get; }
+    public IPropertyImageRepository PropertyImages { get; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -23,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
         BlockedDates = new BlockedDateRepository(context);
         Reviews = new ReviewRepository(context);
         Notifications = new NotificationRepository(context);
+        PropertyImages = new PropertyImageRepository(context);
     }
 
     public async Task<int> CommitAsync() =>

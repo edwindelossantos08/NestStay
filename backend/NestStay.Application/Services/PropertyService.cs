@@ -27,7 +27,7 @@ public class PropertyService : IPropertyService
             Location      = request.Location,
             PricePerNight = request.PricePerNight,
             Capacity      = request.Capacity,
-            // Guardar la URL tal como la ingresó el host
+            // Guardar la URL tal como la ingresó el host (compatibilidad)
             ImageUrl      = request.ImageUrl,
             Latitude      = request.Latitude,
             Longitude     = request.Longitude,
@@ -37,10 +37,30 @@ public class PropertyService : IPropertyService
         await _uow.Properties.AddAsync(property);
         await _uow.CommitAsync();
 
+        // Guardar las imágenes si se proporcionaron
+        if (request.ImageUrls.Any())
+        {
+            var images = request.ImageUrls
+                .Take(5) // máximo 5 imágenes
+                .Select((url, index) => new PropertyImage
+                {
+                    PropertyId   = property.Id,
+                    Url          = url,
+                    DisplayOrder = index
+                });
+
+            foreach (var image in images)
+                await _uow.PropertyImages.AddAsync(image);
+
+            // La primera imagen es la principal (compatibilidad con ImageUrl)
+            property.ImageUrl = request.ImageUrls.First();
+
+            await _uow.CommitAsync();
+        }
+
         // Cargar el host para incluir su nombre en la respuesta
         var host = await _uow.Users.GetByIdAsync(hostId);
-
-        return MapToResponse(property, host!, 0, 0);
+        return await MapToResponseAsync(property, host!, 0, 0);
     }
 
     public async Task<PropertyResponse> UpdateAsync(int hostId, int propertyId, UpdatePropertyRequest request)
@@ -60,10 +80,32 @@ public class PropertyService : IPropertyService
         property.Location      = request.Location;
         property.PricePerNight = request.PricePerNight;
         property.Capacity      = request.Capacity;
-        // Permite reemplazar o limpiar la imagen
+        // Permite reemplazar o limpiar la imagen (compatibilidad)
         property.ImageUrl      = request.ImageUrl;
         property.Latitude      = request.Latitude;
         property.Longitude     = request.Longitude;
+
+        // Reemplazar todas las imágenes si se enviaron nuevas
+        if (request.ImageUrls.Any())
+        {
+            // Eliminar imágenes anteriores
+            await _uow.PropertyImages.DeleteByPropertyIdAsync(property.Id);
+
+            // Agregar las nuevas
+            var images = request.ImageUrls
+                .Take(5)
+                .Select((url, index) => new PropertyImage
+                {
+                    PropertyId   = property.Id,
+                    Url          = url,
+                    DisplayOrder = index
+                });
+
+            foreach (var image in images)
+                await _uow.PropertyImages.AddAsync(image);
+
+            property.ImageUrl = request.ImageUrls.First();
+        }
 
         await _uow.CommitAsync();
 
@@ -71,7 +113,7 @@ public class PropertyService : IPropertyService
         var avgRating = await _uow.Reviews.GetAverageRatingAsync(propertyId);
         var reviews = await _uow.Reviews.GetByPropertyIdAsync(propertyId);
 
-        return MapToResponse(property, host!, avgRating, reviews.Count());
+        return await MapToResponseAsync(property, host!, avgRating, reviews.Count());
     }
 
     public async Task DeleteAsync(int hostId, int propertyId)
@@ -118,7 +160,7 @@ public class PropertyService : IPropertyService
             })
             .ToList();
 
-        return MapToResponse(property, host!, avgRating, reviews.Count, latestReviews);
+        return await MapToResponseAsync(property, host!, avgRating, reviews.Count, latestReviews);
     }
 
     public async Task<IEnumerable<PropertyResponse>> GetByHostAsync(int hostId)
@@ -132,7 +174,7 @@ public class PropertyService : IPropertyService
         {
             var avgRating = await _uow.Reviews.GetAverageRatingAsync(property.Id);
             var reviews = await _uow.Reviews.GetByPropertyIdAsync(property.Id);
-            result.Add(MapToResponse(property, host!, avgRating, reviews.Count()));
+            result.Add(await MapToResponseAsync(property, host!, avgRating, reviews.Count()));
         }
 
         return result;
@@ -185,7 +227,7 @@ public class PropertyService : IPropertyService
         {
             var avgRating = await _uow.Reviews.GetAverageRatingAsync(property.Id);
             var reviews = await _uow.Reviews.GetByPropertyIdAsync(property.Id);
-            result.Add(MapToResponse(property, property.Host!, avgRating, reviews.Count()));
+            result.Add(await MapToResponseAsync(property, property.Host!, avgRating, reviews.Count()));
         }
 
         return new SearchPropertiesResponse
@@ -197,14 +239,119 @@ public class PropertyService : IPropertyService
         };
     }
 
-    // Mapeo centralizado de entidad a DTO de respuesta
-    private static PropertyResponse MapToResponse(
+    // Agrega imágenes hasta completar 5 en total
+    public async Task<List<PropertyImageResponse>> AddImagesAsync(int hostId, int propertyId, List<string> imageUrls)
+    {
+        var property = await _uow.Properties.GetByIdAsync(propertyId);
+
+        if (property is null)
+            throw new NotFoundException("Propiedad", propertyId);
+
+        if (property.HostId != hostId)
+            throw new UnauthorizedException();
+
+        var existing = (await _uow.PropertyImages.GetByPropertyIdAsync(propertyId)).ToList();
+        int availableSlots = 5 - existing.Count;
+
+        // Si ya tiene 5 imágenes no se pueden agregar más
+        if (availableSlots <= 0)
+            throw new BusinessRuleException("La propiedad ya tiene el máximo de 5 imágenes");
+
+        int nextOrder = existing.Any() ? existing.Max(i => i.DisplayOrder) + 1 : 0;
+
+        var toAdd = imageUrls.Take(availableSlots).ToList();
+        foreach (var url in toAdd)
+        {
+            await _uow.PropertyImages.AddAsync(new PropertyImage
+            {
+                PropertyId   = propertyId,
+                Url          = url,
+                DisplayOrder = nextOrder++
+            });
+        }
+
+        // Si la propiedad no tiene imagen principal, asignar la primera nueva
+        if (property.ImageUrl is null && toAdd.Any())
+            property.ImageUrl = toAdd.First();
+
+        await _uow.CommitAsync();
+
+        var all = await _uow.PropertyImages.GetByPropertyIdAsync(propertyId);
+        return all.Select(i => new PropertyImageResponse
+        {
+            Id           = i.Id,
+            Url          = i.Url,
+            DisplayOrder = i.DisplayOrder
+        }).ToList();
+    }
+
+    // Elimina una imagen específica y actualiza ImageUrl si era la principal
+    public async Task DeleteImageAsync(int hostId, int propertyId, int imageId)
+    {
+        var property = await _uow.Properties.GetByIdAsync(propertyId);
+
+        if (property is null)
+            throw new NotFoundException("Propiedad", propertyId);
+
+        if (property.HostId != hostId)
+            throw new UnauthorizedException();
+
+        var image = await _uow.PropertyImages.GetByIdAsync(imageId);
+
+        if (image is null || image.PropertyId != propertyId)
+            throw new NotFoundException("Imagen", imageId);
+
+        _uow.PropertyImages.Delete(image);
+        await _uow.CommitAsync();
+
+        // Actualizar ImageUrl hacia la nueva primera imagen
+        var remaining = await _uow.PropertyImages.GetByPropertyIdAsync(propertyId);
+        property.ImageUrl = remaining.FirstOrDefault()?.Url;
+        await _uow.CommitAsync();
+    }
+
+    // Reordena las imágenes según el array de IDs recibido
+    public async Task ReorderImagesAsync(int hostId, int propertyId, List<int> imageIds)
+    {
+        var property = await _uow.Properties.GetByIdAsync(propertyId);
+
+        if (property is null)
+            throw new NotFoundException("Propiedad", propertyId);
+
+        if (property.HostId != hostId)
+            throw new UnauthorizedException();
+
+        var images = (await _uow.PropertyImages.GetByPropertyIdAsync(propertyId)).ToList();
+
+        // Actualizar DisplayOrder según la posición en el array
+        for (int i = 0; i < imageIds.Count; i++)
+        {
+            var image = images.FirstOrDefault(img => img.Id == imageIds[i]);
+            if (image is not null)
+                image.DisplayOrder = i;
+        }
+
+        // ImageUrl apunta siempre a la primera imagen del nuevo orden
+        var firstId = imageIds.FirstOrDefault();
+        var first = images.FirstOrDefault(img => img.Id == firstId);
+        if (first is not null)
+            property.ImageUrl = first.Url;
+
+        await _uow.CommitAsync();
+    }
+
+    // Mapeo centralizado de entidad a DTO de respuesta (async para cargar imágenes)
+    private async Task<PropertyResponse> MapToResponseAsync(
         Property property,
         Domain.Entities.User host,
         double avgRating,
         int totalReviews,
-        List<ReviewResponse>? latestReviews = null) =>
-        new PropertyResponse
+        List<ReviewResponse>? latestReviews = null)
+    {
+        // Cargar las imágenes de la propiedad
+        var images = (await _uow.PropertyImages.GetByPropertyIdAsync(property.Id)).ToList();
+
+        return new PropertyResponse
         {
             Id            = property.Id,
             Title         = property.Title,
@@ -214,7 +361,14 @@ public class PropertyService : IPropertyService
             Capacity      = property.Capacity,
             HostId        = property.HostId,
             HostName      = host.Name,
-            ImageUrl      = property.ImageUrl,
+            // Mantener ImageUrl apuntando a la primera imagen
+            ImageUrl      = images.FirstOrDefault()?.Url ?? property.ImageUrl,
+            Images        = images.Select(i => new PropertyImageResponse
+            {
+                Id           = i.Id,
+                Url          = i.Url,
+                DisplayOrder = i.DisplayOrder
+            }).ToList(),
             AverageRating = avgRating,
             TotalReviews  = totalReviews,
             CreatedAt     = property.CreatedAt,
@@ -222,4 +376,5 @@ public class PropertyService : IPropertyService
             Longitude     = property.Longitude,
             LatestReviews = latestReviews ?? []
         };
+    }
 }

@@ -122,4 +122,34 @@ public class PropertiesController : ControllerBase
         var result = await _reviewService.GetByPropertyAsync(id);
         return Ok(ApiResponse<PropertyReviewsResponse>.Ok(result));
     }
+
+    // POST /api/properties/{id}/images — agrega imágenes a una propiedad existente
+    [HttpPost("{id:int}/images")]
+    [Authorize(Roles = "Host")]
+    public async Task<IActionResult> AddImages(int id, [FromBody] AddImagesRequest request)
+    {
+        var hostId = User.GetUserId();
+        var result = await _propertyService.AddImagesAsync(hostId, id, request.ImageUrls);
+        return Ok(ApiResponse<List<PropertyImageResponse>>.Ok(result, "Imágenes agregadas exitosamente"));
+    }
+
+    // DELETE /api/properties/{id}/images/{imageId} — elimina una imagen específica
+    [HttpDelete("{id:int}/images/{imageId:int}")]
+    [Authorize(Roles = "Host")]
+    public async Task<IActionResult> DeleteImage(int id, int imageId)
+    {
+        var hostId = User.GetUserId();
+        await _propertyService.DeleteImageAsync(hostId, id, imageId);
+        return Ok(ApiResponse<string>.Ok("Imagen eliminada", "Imagen eliminada exitosamente"));
+    }
+
+    // PUT /api/properties/{id}/images/reorder — reordena imágenes según el array de IDs
+    [HttpPut("{id:int}/images/reorder")]
+    [Authorize(Roles = "Host")]
+    public async Task<IActionResult> ReorderImages(int id, [FromBody] ReorderImagesRequest request)
+    {
+        var hostId = User.GetUserId();
+        await _propertyService.ReorderImagesAsync(hostId, id, request.ImageIds);
+        return Ok(ApiResponse<string>.Ok("Imágenes reordenadas", "Imágenes reordenadas exitosamente"));
+    }
 }
