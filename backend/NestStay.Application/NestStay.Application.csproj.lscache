@@ -77,6 +77,7 @@ DTOs/Notifications/
  NotificationListResponse.cs
  NotificationResponse.cs
 DTOs/Properties/
+ AmenityResponse.cs
  CreatePropertyRequest.cs
  PropertyImageRequests.cs
  PropertyImageResponse.cs
@@ -89,6 +90,7 @@ DTOs/Reviews/
  PropertyReviewsResponse.cs
  ReviewResponse.cs
 Interfaces/Repositories/
+ IAmenityRepository.cs
  IBlockedDateRepository.cs
  IBookingRepository.cs
  INotificationRepository.cs
@@ -99,6 +101,7 @@ Interfaces/Repositories/
  IUnitOfWork.cs
  IUserRepository.cs
 Interfaces/Services/
+ IAmenityService.cs
  IAuthService.cs
  IAvailabilityService.cs
  IBookingService.cs
@@ -112,6 +115,7 @@ obj/Debug/net10.0/
  NestStay.Application.AssemblyInfo.cs
  NestStay.Application.GlobalUsings.g.cs
 Services/
+ AmenityService.cs
  AuthService.cs
  AvailabilityService.cs
  BookingService.cs
