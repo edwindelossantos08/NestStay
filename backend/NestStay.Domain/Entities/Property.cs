@@ -11,6 +11,9 @@ public class Property
     public int Capacity { get; set; }
     // URL de imagen de la propiedad, ingresada por el host (opcional)
     public string? ImageUrl { get; set; }
+    // Coordenadas geográficas opcionales para mostrar en el mapa
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public User Host { get; set; } = null!;

@@ -29,6 +29,8 @@ public class PropertyService : IPropertyService
             Capacity      = request.Capacity,
             // Guardar la URL tal como la ingresó el host
             ImageUrl      = request.ImageUrl,
+            Latitude      = request.Latitude,
+            Longitude     = request.Longitude,
             CreatedAt     = DateTime.UtcNow
         };
 
@@ -60,6 +62,8 @@ public class PropertyService : IPropertyService
         property.Capacity      = request.Capacity;
         // Permite reemplazar o limpiar la imagen
         property.ImageUrl      = request.ImageUrl;
+        property.Latitude      = request.Latitude;
+        property.Longitude     = request.Longitude;
 
         await _uow.CommitAsync();
 
@@ -214,6 +218,8 @@ public class PropertyService : IPropertyService
             AverageRating = avgRating,
             TotalReviews  = totalReviews,
             CreatedAt     = property.CreatedAt,
+            Latitude      = property.Latitude,
+            Longitude     = property.Longitude,
             LatestReviews = latestReviews ?? []
         };
 }

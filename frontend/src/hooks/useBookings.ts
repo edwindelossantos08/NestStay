@@ -6,6 +6,7 @@ export const useMyBookings = (status?: string) =>
   useQuery({
     queryKey: ['my-bookings', status],
     queryFn: () => bookingsApi.getMyBookings(status).then((r) => r.data.data),
+    queryFn: () => bookingsApi.getMyBookings(status).then((r) => r.data.data),
   })
 
 export const useReceivedBookings = (status?: string) =>

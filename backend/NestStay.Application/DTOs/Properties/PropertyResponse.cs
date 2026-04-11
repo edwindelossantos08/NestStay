@@ -17,6 +17,9 @@ public class PropertyResponse
     public double AverageRating { get; set; }
     public int TotalReviews { get; set; }
     public DateTime CreatedAt { get; set; }
+    // Coordenadas para el pin en el mapa
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     // Últimas 5 reseñas, solo se incluyen en GetByIdAsync
     public List<ReviewResponse> LatestReviews { get; set; } = [];
 }

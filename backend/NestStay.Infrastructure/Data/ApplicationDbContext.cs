@@ -39,6 +39,15 @@ public class ApplicationDbContext : DbContext
             // ImageUrl es opcional, máximo 500 caracteres
             entity.Property(p => p.ImageUrl).HasMaxLength(500).IsRequired(false);
 
+            // Precisión decimal(10,7) suficiente para coordenadas GPS
+            entity.Property(p => p.Latitude)
+                  .HasColumnType("decimal(10,7)")
+                  .IsRequired(false);
+
+            entity.Property(p => p.Longitude)
+                  .HasColumnType("decimal(10,7)")
+                  .IsRequired(false);
+
             entity.HasOne(p => p.Host)
                   .WithMany(u => u.Properties)
                   .HasForeignKey(p => p.HostId)

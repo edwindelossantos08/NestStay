@@ -9,4 +9,7 @@ public class CreatePropertyRequest
     public int Capacity { get; set; }
     // URL de imagen opcional, el host la pega desde cualquier fuente
     public string? ImageUrl { get; set; }
+    // Coordenadas opcionales que el frontend envía tras geocodificar
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
 }
