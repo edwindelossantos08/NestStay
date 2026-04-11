@@ -14,4 +14,6 @@ public class CreatePropertyRequest
     // Coordenadas opcionales que el frontend envía tras geocodificar
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
+    // IDs de amenidades seleccionadas por el host
+    public List<int> AmenityIds { get; set; } = new();
 }

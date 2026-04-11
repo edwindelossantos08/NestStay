@@ -54,9 +54,11 @@ builder.Services.AddScoped<IBlockedDateRepository, BlockedDateRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IPropertyImageRepository, PropertyImageRepository>();
+builder.Services.AddScoped<IAmenityRepository, AmenityRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IBookingService, BookingService>();

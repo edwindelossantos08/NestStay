@@ -13,4 +13,6 @@ public class UpdatePropertyRequest
     public List<string> ImageUrls { get; set; } = new();
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
+    // Reemplaza todas las amenidades al actualizar
+    public List<int> AmenityIds { get; set; } = new();
 }

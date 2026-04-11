@@ -4,16 +4,19 @@ using NestStay.Application.Interfaces.Repositories;
 using NestStay.Application.Interfaces.Services;
 using NestStay.Domain.Entities;
 using NestStay.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace NestStay.Application.Services;
 
 public class PropertyService : IPropertyService
 {
     private readonly IUnitOfWork _uow;
+    private readonly DbContext _context;
 
-    public PropertyService(IUnitOfWork uow)
+    public PropertyService(IUnitOfWork uow, DbContext context)
     {
         _uow = uow;
+        _context = context;
     }
 
     public async Task<PropertyResponse> CreateAsync(int hostId, CreatePropertyRequest request)
@@ -55,6 +58,22 @@ public class PropertyService : IPropertyService
             // La primera imagen es la principal (compatibilidad con ImageUrl)
             property.ImageUrl = request.ImageUrls.First();
 
+            await _uow.CommitAsync();
+        }
+
+        // Asignar amenidades si se enviaron
+        if (request.AmenityIds.Any())
+        {
+            var amenities = await _uow.Amenities.GetByIdsAsync(request.AmenityIds);
+
+            foreach (var amenity in amenities)
+            {
+                await _uow.PropertyAmenities.AddAsync(new PropertyAmenity
+                {
+                    PropertyId = property.Id,
+                    AmenityId = amenity.Id
+                });
+            }
             await _uow.CommitAsync();
         }
 
@@ -105,6 +124,26 @@ public class PropertyService : IPropertyService
                 await _uow.PropertyImages.AddAsync(image);
 
             property.ImageUrl = request.ImageUrls.First();
+        }
+
+        // Reemplazar amenidades si se enviaron
+        if (request.AmenityIds.Any())
+        {
+            // Eliminar relaciones anteriores
+            var existing = await _context.Set<PropertyAmenity>()
+                .Where(pa => pa.PropertyId == property.Id)
+                .ToListAsync();
+            _context.Set<PropertyAmenity>().RemoveRange(existing);
+
+            // Agregar las nuevas
+            foreach (var amenityId in request.AmenityIds)
+            {
+                await _uow.PropertyAmenities.AddAsync(new PropertyAmenity
+                {
+                    PropertyId = property.Id,
+                    AmenityId = amenityId
+                });
+            }
         }
 
         await _uow.CommitAsync();
@@ -351,6 +390,23 @@ public class PropertyService : IPropertyService
         // Cargar las imágenes de la propiedad
         var images = (await _uow.PropertyImages.GetByPropertyIdAsync(property.Id)).ToList();
 
+        // Incluir amenidades en la respuesta
+        var propertyAmenities = await _context.Set<PropertyAmenity>()
+            .Include(pa => pa.Amenity)
+            .Where(pa => pa.PropertyId == property.Id)
+            .ToListAsync();
+
+        var amenitiesList = propertyAmenities
+            .Select(pa => new AmenityResponse
+            {
+                Id = pa.Amenity.Id,
+                Name = pa.Amenity.Name,
+                Icon = pa.Amenity.Icon,
+                Category = pa.Amenity.Category
+            })
+            .OrderBy(a => a.Category)
+            .ToList();
+
         return new PropertyResponse
         {
             Id            = property.Id,
@@ -374,6 +430,7 @@ public class PropertyService : IPropertyService
             CreatedAt     = property.CreatedAt,
             Latitude      = property.Latitude,
             Longitude     = property.Longitude,
+            Amenities     = amenitiesList,
             LatestReviews = latestReviews ?? []
         };
     }

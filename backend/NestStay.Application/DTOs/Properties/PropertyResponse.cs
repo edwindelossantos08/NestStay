@@ -24,6 +24,8 @@ public class PropertyResponse
     // Coordenadas para el pin en el mapa
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
+    // Amenidades agrupadas por categoría
+    public List<AmenityResponse> Amenities { get; set; } = new();
     // Últimas 5 reseñas, solo se incluyen en GetByIdAsync
     public List<ReviewResponse> LatestReviews { get; set; } = [];
 }

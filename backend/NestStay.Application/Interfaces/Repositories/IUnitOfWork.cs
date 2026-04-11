@@ -1,3 +1,5 @@
+using NestStay.Domain.Entities;
+
 namespace NestStay.Application.Interfaces.Repositories;
 
 public interface IUnitOfWork
@@ -9,5 +11,7 @@ public interface IUnitOfWork
     IReviewRepository Reviews { get; }
     INotificationRepository Notifications { get; }
     IPropertyImageRepository PropertyImages { get; }
+    IAmenityRepository Amenities { get; }
+    IRepository<PropertyAmenity> PropertyAmenities { get; }
     Task<int> CommitAsync();
 }

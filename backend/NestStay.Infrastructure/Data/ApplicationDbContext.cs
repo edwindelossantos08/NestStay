@@ -18,6 +18,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Amenity> Amenities => Set<Amenity>();
+    public DbSet<PropertyAmenity> PropertyAmenities => Set<PropertyAmenity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -128,5 +130,59 @@ public class ApplicationDbContext : DbContext
         {
             entity.Property(n => n.IsRead).HasDefaultValue(false);
         });
+
+        // --- Amenity ---
+        modelBuilder.Entity<Amenity>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.Name).HasMaxLength(100).IsRequired();
+            entity.Property(a => a.Icon).HasMaxLength(50).IsRequired();
+            entity.Property(a => a.Category).HasMaxLength(50).IsRequired();
+            entity.HasIndex(a => a.Name).IsUnique();
+        });
+
+        // --- PropertyAmenity ---
+        modelBuilder.Entity<PropertyAmenity>(entity =>
+        {
+            entity.HasKey(pa => new { pa.PropertyId, pa.AmenityId });
+
+            entity.HasOne(pa => pa.Property)
+                .WithMany(p => p.PropertyAmenities)
+                .HasForeignKey(pa => pa.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pa => pa.Amenity)
+                .WithMany(a => a.PropertyAmenities)
+                .HasForeignKey(pa => pa.AmenityId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // --- Seed Data ---
+        modelBuilder.Entity<Amenity>().HasData(
+            // Esenciales
+            new Amenity { Id = 1, Name = "WiFi", Icon = "Wifi", Category = "Esenciales" },
+            new Amenity { Id = 2, Name = "Cocina", Icon = "UtensilsCrossed", Category = "Esenciales" },
+            new Amenity { Id = 3, Name = "Lavadora", Icon = "WashingMachine", Category = "Esenciales" },
+            new Amenity { Id = 4, Name = "Aire acondicionado", Icon = "Wind", Category = "Esenciales" },
+            new Amenity { Id = 5, Name = "Calefacción", Icon = "Flame", Category = "Esenciales" },
+            new Amenity { Id = 6, Name = "TV", Icon = "Tv", Category = "Esenciales" },
+            
+            // Características especiales
+            new Amenity { Id = 7, Name = "Piscina", Icon = "Waves", Category = "Características" },
+            new Amenity { Id = 8, Name = "Jacuzzi", Icon = "Droplets", Category = "Características" },
+            new Amenity { Id = 9, Name = "Gimnasio", Icon = "Dumbbell", Category = "Características" },
+            new Amenity { Id = 10, Name = "Terraza", Icon = "Sun", Category = "Características" },
+            new Amenity { Id = 11, Name = "Barbacoa", Icon = "Flame", Category = "Características" },
+            
+            // Seguridad
+            new Amenity { Id = 12, Name = "Detector de humo", Icon = "AlertTriangle", Category = "Seguridad" },
+            new Amenity { Id = 13, Name = "Extintor", Icon = "Shield", Category = "Seguridad" },
+            new Amenity { Id = 14, Name = "Botiquín", Icon = "Heart", Category = "Seguridad" },
+            
+            // Ubicación
+            new Amenity { Id = 15, Name = "Estacionamiento gratuito", Icon = "Car", Category = "Ubicación" },
+            new Amenity { Id = 16, Name = "Frente al mar", Icon = "Waves", Category = "Ubicación" },
+            new Amenity { Id = 17, Name = "Vista a la montaña", Icon = "Mountain", Category = "Ubicación" }
+        );
     }
 }

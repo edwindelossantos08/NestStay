@@ -22,6 +22,8 @@ public class Property
     public ICollection<Review> Reviews { get; set; }
     // Colección de imágenes de la propiedad
     public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
+    // Amenidades de la propiedad
+    public ICollection<PropertyAmenity> PropertyAmenities { get; set; } = new List<PropertyAmenity>();
 
     public Property()
     {
