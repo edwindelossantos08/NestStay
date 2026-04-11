@@ -9,6 +9,7 @@ export interface PropertyResponse {
   capacity: number
   hostId: number
   hostName: string
+  hostAvatarUrl?: string
   // URL de imagen proporcionada por el host, puede ser null
   imageUrl?: string
   // Coordenadas para el pin en el mapa

@@ -8,6 +8,7 @@ import PropertyDetailPage from './pages/properties/PropertyDetailPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ConfirmAccountPage from './pages/auth/ConfirmAccountPage'
+import ProfilePage from './pages/auth/ProfilePage'
 import NotificationsPage from './pages/notifications/NotificationsPage'
 import HostLayout from './components/layout/HostLayout'
 import DashboardPage from './pages/host/DashboardPage'
@@ -31,6 +32,7 @@ export default function App() {
         {/* Rutas protegidas — cualquier usuario autenticado */}
         <Route element={<ProtectedRoute />}>
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         {/* Rutas protegidas por rol Host — con sidebar lateral */}
