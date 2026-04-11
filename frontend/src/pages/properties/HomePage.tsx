@@ -28,7 +28,7 @@ export default function HomePage() {
     checkOut: '',
     capacity: '',
   })
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [, setActiveCategory] = useState('all')
 
   // Carga propiedades sin filtros para el listado de la home
   const { data: searchResult, isLoading } = useSearchProperties({})

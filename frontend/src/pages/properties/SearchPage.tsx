@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, SlidersHorizontal } from 'lucide-react'
+import { Search, SlidersHorizontal, List, Map } from 'lucide-react'
 import { useSearchProperties } from '../../hooks/useProperties'
 import PropertyCard from '../../components/shared/PropertyCard'
 import type { SearchPropertiesRequest } from '../../types/property.types'
 
+const PropertyMap = React.lazy(() => import('../../components/shared/PropertyMap'))
 // Skeleton de card mientras carga
 const PropertyCardSkeleton = () => (
   <div className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
@@ -23,6 +24,8 @@ const PropertyCardSkeleton = () => (
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<number | null>(null)
 
   // Lee los filtros desde la query string
   const [filters, setFilters] = useState<SearchPropertiesRequest>({
@@ -179,12 +182,20 @@ export default function SearchPage() {
         {/* Botón filtros en móvil */}
         <div className="flex items-center justify-between mb-6 md:hidden">
           <h1 className="text-xl font-bold text-dark">Resultados</h1>
-          <button
-            onClick={() => setFiltersOpen(!filtersOpen)}
-            className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-700"
-          >
-            <SlidersHorizontal className="h-4 w-4" /> Filtros
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowMap(!showMap)}
+              className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:border-gray-400 transition-colors"
+            >
+              {showMap ? <List className="h-4 w-4" /> : <Map className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-700"
+            >
+              <SlidersHorizontal className="h-4 w-4" /> Filtros
+            </button>
+          </div>
         </div>
 
         {/* Drawer móvil */}
@@ -226,9 +237,55 @@ export default function SearchPage() {
                   ? 'Buscando...'
                   : `${totalCount} propiedad${totalCount !== 1 ? 'es' : ''} encontrada${totalCount !== 1 ? 's' : ''}`}
               </h1>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowMap(!showMap)}
+                  className="ml-auto flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 text-sm font-medium hover:border-gray-900 transition-colors"
+                >
+                  {showMap ? (
+                    <><List className="h-4 w-4" /> Ver lista</>
+                  ) : (
+                    <><Map className="h-4 w-4" /> Ver mapa</>
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Grid de resultados */}
+            {/* Grid o Mapa */}
+            {showMap ? (
+              <div className="grid md:grid-cols-2 gap-4 h-[calc(100vh-200px)]">
+                {/* Lista scrolleable */}
+                <div className="hidden md:block overflow-y-auto space-y-4 pr-2">
+                  {isLoading
+                    ? Array.from({ length: 4 }).map((_, i) => <PropertyCardSkeleton key={i} />)
+                    : properties.map(p => (
+                    <div
+                      key={p.id}
+                      onMouseEnter={() => setHoveredPropertyId(p.id)}
+                      onMouseLeave={() => setHoveredPropertyId(null)}
+                    >
+                      <PropertyCard property={p} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mapa sticky */}
+                <div className="sticky top-0 h-[calc(100vh-200px)] md:h-full">
+                  <React.Suspense fallback={
+                    <div className="h-full bg-gray-100 rounded-2xl animate-pulse flex items-center justify-center">
+                      <span className="text-gray-400">Cargando mapa...</span>
+                    </div>
+                  }>
+                    <PropertyMap
+                      properties={properties}
+                      highlightedPropertyId={hoveredPropertyId ?? undefined}
+                      className="h-full w-full rounded-2xl z-0"
+                    />
+                  </React.Suspense>
+                </div>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
               {isLoading
                 ? Array.from({ length: 9 }).map((_, i) => <PropertyCardSkeleton key={i} />)
@@ -236,6 +293,7 @@ export default function SearchPage() {
                     <PropertyCard key={property.id} property={property} />
                   ))}
             </div>
+            )}
 
             {/* Estado vacío */}
             {!isLoading && properties.length === 0 && (

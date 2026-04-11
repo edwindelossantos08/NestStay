@@ -11,6 +11,9 @@ export interface PropertyResponse {
   hostName: string
   // URL de imagen proporcionada por el host, puede ser null
   imageUrl?: string
+  // Coordenadas para el pin en el mapa
+  latitude?: number
+  longitude?: number
   averageRating: number
   totalReviews: number
   createdAt: string
@@ -25,6 +28,8 @@ export interface CreatePropertyRequest {
   capacity: number
   // Opcional: el host puede pegar una URL de imagen
   imageUrl?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface UpdatePropertyRequest {
@@ -34,6 +39,8 @@ export interface UpdatePropertyRequest {
   pricePerNight: number
   capacity: number
   imageUrl?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface SearchPropertiesRequest {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { MapPin, User, Users, DollarSign, Home } from 'lucide-react'
 import { usePropertyById, usePropertyReviews } from '../../hooks/useProperties'
@@ -11,6 +11,8 @@ import StarRating from '../../components/shared/StarRating'
 import Modal from '../../components/ui/Modal'
 import DateRangePicker from '../../components/shared/DateRangePicker'
 import { formatPrice, calculateNights, timeAgo } from '../../utils/formatters'
+
+const PropertyMap = React.lazy(() => import('../../components/shared/PropertyMap'))
 
 // Card individual de reseña
 const ReviewCard = ({
@@ -206,6 +208,30 @@ export default function PropertyDetailPage() {
                   {property.description}
                 </p>
               </div>
+
+              {/* Sección del mapa — solo si hay ubicación */}
+              <section className="mt-8 pt-8 border-t border-gray-200">
+                <h2 className="text-xl font-semibold text-gray-900 mb-1">
+                  Dónde estarás
+                </h2>
+                <p className="text-gray-500 text-sm mb-4">
+                  📍 {property.location}, República Dominicana
+                </p>
+
+                <React.Suspense fallback={
+                  <div className="h-80 bg-gray-100 rounded-2xl animate-pulse" />
+                }>
+                  <PropertyMap
+                    property={property}
+                    className="h-80 rounded-2xl z-0"
+                  />
+                </React.Suspense>
+
+                {/* Igual que Airbnb — no muestra dirección exacta */}
+                <p className="text-sm text-gray-500 mt-3">
+                  La dirección exacta se comparte tras confirmar la reserva.
+                </p>
+              </section>
             </div>
 
             {/* Sección de reseñas */}

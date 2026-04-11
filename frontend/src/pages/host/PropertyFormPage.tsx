@@ -16,6 +16,8 @@ const schema = z.object({
     .string()
     .min(20, 'La descripción debe tener al menos 20 caracteres'),
   location: z.string().min(3, 'La ubicación es requerida'),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   pricePerNight: z
     .number({ error: 'Ingresa un precio válido' })
     .min(1, 'El precio debe ser mayor a 0')
@@ -61,6 +63,8 @@ export default function PropertyFormPage() {
       title: '',
       description: '',
       location: '',
+      latitude: undefined,
+      longitude: undefined,
       pricePerNight: undefined,
       capacity: undefined,
       imageUrl: '',
@@ -73,6 +77,8 @@ export default function PropertyFormPage() {
       setValue('title', property.title)
       setValue('description', property.description)
       setValue('location', property.location)
+      if (property.latitude) setValue('latitude', property.latitude)
+      if (property.longitude) setValue('longitude', property.longitude)
       setValue('pricePerNight', property.pricePerNight)
       setValue('capacity', property.capacity)
       // Pre-rellena la imagen existente si la tiene
@@ -83,11 +89,40 @@ export default function PropertyFormPage() {
   // Observa el campo imageUrl para el preview en tiempo real
   const watchedImageUrl = watch('imageUrl')
 
+  const watchedLat = watch('latitude')
+  const watchedLng = watch('longitude')
+
+  const geocodeLocation = async (location: string) => {
+    if (!location) return
+    try {
+      const query = `${location}, República Dominicana`
+      const url = `https://nominatim.openstreetmap.org/search?q=${
+        encodeURIComponent(query)}&format=json&limit=1`
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'NestStay/1.0 (proyecto universitario)'
+        }
+      })
+      const data = await response.json()
+
+      if (data.length > 0) {
+        setValue('latitude', parseFloat(data[0].lat))
+        setValue('longitude', parseFloat(data[0].lon))
+        toast.success(`📍 Ubicación encontrada: ${data[0].display_name}`)
+      }
+    } catch {
+      // Si falla el geocoding simplemente no se guardan coordenadas
+    }
+  }
+
   const onSubmit = (data: FormValues) => {
     const payload = {
       title: data.title,
       description: data.description,
       location: data.location,
+      latitude: data.latitude,
+      longitude: data.longitude,
       pricePerNight: data.pricePerNight,
       capacity: data.capacity,
       imageUrl: data.imageUrl || undefined,
@@ -137,6 +172,9 @@ export default function PropertyFormPage() {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5"
       >
+        <input type="hidden" {...register('latitude', { valueAsNumber: true })} />
+        <input type="hidden" {...register('longitude', { valueAsNumber: true })} />
+
         {/* Título */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -176,13 +214,20 @@ export default function PropertyFormPage() {
             Ubicación
           </label>
           <input
-            {...register('location')}
+            {...register('location', {
+              onBlur: (e) => geocodeLocation(e.target.value)
+            })}
             placeholder="Ej: Santo Domingo, República Dominicana"
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
           />
           {errors.location && (
             <p className="text-xs text-red-500 mt-1">
               {errors.location.message}
+            </p>
+          )}
+          {watchedLat && watchedLng && (
+            <p className="text-xs text-green-600 mt-1">
+              ✅ Ubicación confirmada en el mapa
             </p>
           )}
         </div>
