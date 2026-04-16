@@ -15,6 +15,8 @@ import MyPropertiesPage from '../pages/host/MyPropertiesPage'
 import PropertyFormPage from '../pages/host/PropertyFormPage'
 import AvailabilityPage from '../pages/host/AvailabilityPage'
 import MyBookingsPage from '../pages/guest/MyBookingsPage'
+import PrivacyPage from '../pages/legal/PrivacyPage'
+import TermsPage from '../pages/legal/TermsPage'
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,8 @@ const router = createBrowserRouter([
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
       { path: '/confirm-account', element: <ConfirmAccountPage /> },
+      { path: '/privacy', element: <PrivacyPage /> },
+      { path: '/terms', element: <TermsPage /> },
 
       // Rutas protegidas — cualquier usuario autenticado
       {

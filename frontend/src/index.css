@@ -24,6 +24,15 @@ body {
   color: #222222;
 }
 
+/* Hide mm/dd/yyyy placeholder on empty date inputs */
+input[type="date"]:not([value])::-webkit-datetime-edit,
+input[type="date"][value=""]::-webkit-datetime-edit {
+  color: transparent;
+}
+input[type="date"]:focus::-webkit-datetime-edit {
+  color: inherit;
+}
+
 /* Hides scrollbar while keeping scroll functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;

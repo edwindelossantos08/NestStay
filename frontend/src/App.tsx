@@ -16,6 +16,8 @@ import MyPropertiesPage from './pages/host/MyPropertiesPage'
 import PropertyFormPage from './pages/host/PropertyFormPage'
 import AvailabilityPage from './pages/host/AvailabilityPage'
 import MyBookingsPage from './pages/guest/MyBookingsPage'
+import PrivacyPage from './pages/legal/PrivacyPage'
+import TermsPage from './pages/legal/TermsPage'
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/confirm-account" element={<ConfirmAccountPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
 
         {/* Rutas protegidas — cualquier usuario autenticado */}
         <Route element={<ProtectedRoute />}>

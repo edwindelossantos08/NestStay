@@ -1,6 +1,7 @@
-import { Globe } from 'lucide-react'
+import { Globe, ChevronDown } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
-// Minimal inline SVG wrappers for social icons removed from lucide-react v1
 const FacebookIcon = () => (
   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
     <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3H13v6.8c4.56-.93 8-4.96 8-9.8z"/>
@@ -17,111 +18,90 @@ const InstagramIcon = () => (
   </svg>
 )
 
-
-const footerSections = [
-  {
-    title: 'Soporte',
-    links: [
-      'Centro de ayuda',
-      'AirCover',
-      'Información de seguridad',
-      'Opciones de cancelación',
-      'Reporte de problema',
-    ],
-  },
-  {
-    title: 'Comunidad',
-    links: [
-      'Foros NestStay',
-      'Accesibilidad',
-      'NestStay para el trabajo',
-      'Invita a amigos',
-    ],
-  },
-  {
-    title: 'Hospedaje',
-    links: [
-      'Crea tu anuncio',
-      'Protección para hosts',
-      'Recursos para hosts',
-      'Comunidad de hosts',
-      'Hospedaje responsable',
-    ],
-  },
-  {
-    title: 'NestStay',
-    links: [
-      'Sala de prensa',
-      'Novedades',
-      'Empleos',
-      'Inversores',
-      'Política de privacidad',
-    ],
-  },
+const CURRENCIES = [
+  { code: 'USD', symbol: '$', label: 'Dólar estadounidense' },
+  { code: 'EUR', symbol: '€', label: 'Euro' },
+  { code: 'DOP', symbol: 'RD$', label: 'Peso dominicano' },
+  { code: 'MXN', symbol: '$', label: 'Peso mexicano' },
+  { code: 'COP', symbol: '$', label: 'Peso colombiano' },
+  { code: 'ARS', symbol: '$', label: 'Peso argentino' },
+  { code: 'GBP', symbol: '£', label: 'Libra esterlina' },
+  { code: 'BRL', symbol: 'R$', label: 'Real brasileño' },
 ]
+
+function CurrencyPicker() {
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState(CURRENCIES[0])
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1 text-sm text-gray-500 hover:text-dark transition-colors"
+      >
+        {selected.symbol} {selected.code}
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
+
+      {open && (
+        <div className="absolute bottom-full mb-2 right-0 w-56 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+          {CURRENCIES.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => { setSelected(c); setOpen(false) }}
+              className={`w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                selected.code === c.code ? 'text-coral font-semibold' : 'text-gray-700'
+              }`}
+            >
+              <span>{c.label}</span>
+              <span className="text-gray-400">{c.symbol} {c.code}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
-      {/* Main multi-column section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-dark mb-4">
-                {section.title}
-              </h3>
-              <ul className="flex flex-col gap-2.5">
-                {section.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-gray-500 hover:text-dark transition-colors duration-150"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+          <span>© {new Date().getFullYear()} NestStay, Inc.</span>
+          <span>·</span>
+          <Link to="/privacy" className="hover:text-dark transition-colors">Privacidad</Link>
+          <span>·</span>
+          <Link to="/terms" className="hover:text-dark transition-colors">Términos</Link>
+          <span className="hidden sm:inline">·</span>
+          <button className="hidden sm:flex items-center gap-1.5 hover:text-dark transition-colors">
+            <Globe className="h-4 w-4" />
+            Español (ES)
+          </button>
+          <CurrencyPicker />
         </div>
-      </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Copyright + lang/currency */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-            <span>© {new Date().getFullYear()} NestStay, Inc.</span>
-            <span className="hidden sm:inline">·</span>
-            <a href="#" className="hover:text-dark transition-colors">Privacidad</a>
-            <span>·</span>
-            <a href="#" className="hover:text-dark transition-colors">Términos</a>
-            <span>·</span>
-            <a href="#" className="hover:text-dark transition-colors">Mapa del sitio</a>
-            <span className="hidden sm:inline">·</span>
-            <button className="hidden sm:flex items-center gap-1.5 hover:text-dark transition-colors">
-              <Globe className="h-4 w-4" />
-              Español (ES)
-            </button>
-            <button className="hidden sm:flex items-center gap-1.5 hover:text-dark transition-colors">
-              $ USD
-            </button>
-          </div>
-
-          {/* Social icons */}
-          <div className="flex items-center gap-4 text-gray-500">
-            <a href="#" aria-label="Facebook" className="hover:text-dark transition-colors">
-              <FacebookIcon />
-            </a>
-            <a href="#" aria-label="Twitter/X" className="hover:text-dark transition-colors">
-              <TwitterIcon />
-            </a>
-            <a href="#" aria-label="Instagram" className="hover:text-dark transition-colors">
-              <InstagramIcon />
-            </a>
-          </div>
+        <div className="flex items-center gap-4 text-gray-500">
+          <a href="#" aria-label="Facebook" className="hover:text-dark transition-colors">
+            <FacebookIcon />
+          </a>
+          <a href="#" aria-label="Twitter/X" className="hover:text-dark transition-colors">
+            <TwitterIcon />
+          </a>
+          <a href="#" aria-label="Instagram" className="hover:text-dark transition-colors">
+            <InstagramIcon />
+          </a>
         </div>
       </div>
     </footer>
