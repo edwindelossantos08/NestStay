@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { Plus, Trash2, Check } from 'lucide-react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,8 +8,12 @@ import {
   usePropertyById,
   useCreateProperty,
   useUpdateProperty,
+  useAmenities,
 } from '../../hooks/useProperties'
 import { useToast } from '../../context/ToastContext'
+import AmenityIcon from '../../components/shared/AmenityIcon'
+import { cn } from '../../utils/cn'
+import type { AmenityResponse } from '../../types/property.types'
 
 const schema = z.object({
   title: z.string().min(5, 'El título debe tener al menos 5 caracteres'),
@@ -26,13 +31,6 @@ const schema = z.object({
     .number({ error: 'Ingresa una capacidad válida' })
     .min(1, 'La capacidad mínima es 1')
     .max(50, 'La capacidad no puede superar 50'),
-  imageUrl: z
-    .string()
-    .refine((val) => !val || val.startsWith('http'), {
-      message: 'Debe ser una URL de imagen válida',
-    })
-    .optional()
-    .or(z.literal('')),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -50,6 +48,7 @@ export default function PropertyFormPage() {
   const { mutate: updateProperty, isPending: updating } = useUpdateProperty(
     propertyId ?? 0
   )
+  const { data: amenities } = useAmenities()
 
   const {
     register,
@@ -67,9 +66,20 @@ export default function PropertyFormPage() {
       longitude: undefined,
       pricePerNight: undefined,
       capacity: undefined,
-      imageUrl: '',
     },
   })
+
+  const [imageUrls, setImageUrls] = useState<string[]>([''])
+  // En modo edición pre-selecciona las amenidades actuales
+  const [selectedAmenityIds, setSelectedAmenityIds] = useState<number[]>([])
+
+  const toggleAmenity = (amenityId: number) => {
+    setSelectedAmenityIds(prev =>
+      prev.includes(amenityId)
+        ? prev.filter(id => id !== amenityId)
+        : [...prev, amenityId]
+    )
+  }
 
   // Pre-rellena el formulario en modo edición
   useEffect(() => {
@@ -81,13 +91,32 @@ export default function PropertyFormPage() {
       if (property.longitude) setValue('longitude', property.longitude)
       setValue('pricePerNight', property.pricePerNight)
       setValue('capacity', property.capacity)
-      // Pre-rellena la imagen existente si la tiene
-      setValue('imageUrl', property.imageUrl || '')
+      
+      if (property.images && property.images.length > 0) {
+        setImageUrls(property.images.map(i => i.url))
+      } else if (property.imageUrl) {
+        setImageUrls([property.imageUrl])
+      }
+
+      if (property.amenities && property.amenities.length > 0) {
+        setSelectedAmenityIds(property.amenities.map(a => a.id))
+      }
     }
   }, [property, isEdit, setValue])
 
-  // Observa el campo imageUrl para el preview en tiempo real
-  const watchedImageUrl = watch('imageUrl')
+  const addImageUrl = () => {
+    if (imageUrls.length < 5) {
+      setImageUrls(prev => [...prev, ''])
+    }
+  }
+
+  const removeImageUrl = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const updateImageUrl = (index: number, value: string) => {
+    setImageUrls(prev => prev.map((url, i) => i === index ? value : url))
+  }
 
   const watchedLat = watch('latitude')
   const watchedLng = watch('longitude')
@@ -117,6 +146,7 @@ export default function PropertyFormPage() {
   }
 
   const onSubmit = (data: FormValues) => {
+    const validUrls = imageUrls.filter(url => url.trim().length > 0)
     const payload = {
       title: data.title,
       description: data.description,
@@ -125,7 +155,8 @@ export default function PropertyFormPage() {
       longitude: data.longitude,
       pricePerNight: data.pricePerNight,
       capacity: data.capacity,
-      imageUrl: data.imageUrl || undefined,
+      imageUrls: validUrls.length > 0 ? validUrls : undefined,
+      amenityIds: selectedAmenityIds,
     }
 
     if (isEdit) {
@@ -232,54 +263,62 @@ export default function PropertyFormPage() {
           )}
         </div>
 
-        {/* URL de imagen */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            URL de imagen{' '}
-            <span className="text-gray-400 font-normal">(opcional)</span>
-          </label>
-          <input
-            {...register('imageUrl')}
-            placeholder="https://images.unsplash.com/..."
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
-          />
-          {errors.imageUrl && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.imageUrl.message}
+        {/* Imágenes de la propiedad */}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Imágenes de la propiedad (máx. 5)
+            </label>
+            <p className="text-xs text-gray-400">
+              💡 Busca fotos en <a href="https://unsplash.com/s/photos/house" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">unsplash.com</a> y pega su URL. La primera imagen será la foto principal.
             </p>
-          )}
+          </div>
 
-          {/* Preview en tiempo real si la URL es válida */}
-          {watchedImageUrl && watchedImageUrl.startsWith('http') && (
-            <div className="mt-2 rounded-xl overflow-hidden h-40 bg-gray-100 border border-gray-200">
-              <img
-                src={watchedImageUrl}
-                alt="Preview de imagen"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Si la URL falla oculta el preview silenciosamente
-                  e.currentTarget.style.display = 'none'
-                }}
-                onLoad={(e) => {
-                  // Muestra el preview cuando carga correctamente
-                  e.currentTarget.style.display = 'block'
-                }}
-              />
+          {imageUrls.map((url, index) => (
+            <div key={index} className="flex flex-col gap-2 p-3 border border-gray-100 rounded-xl bg-gray-50">
+              <div className="flex items-center gap-2">
+                <input
+                  value={url}
+                  onChange={(e) => updateImageUrl(index, e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/30"
+                />
+                {imageUrls.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeImageUrl(index)}
+                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
+              
+              {/* Preview si URL parece válida */}
+              {url.startsWith('http') && (
+                <div className="h-32 rounded-lg overflow-hidden bg-gray-200">
+                  <img
+                    src={url}
+                    alt={`Preview ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    onLoad={(e) => { e.currentTarget.style.display = 'block' }}
+                  />
+                </div>
+              )}
             </div>
-          )}
+          ))}
 
-          <p className="text-xs text-gray-400 mt-1">
-            Pega la URL de cualquier imagen. Sugerencia:{' '}
-            <a
-              href="https://unsplash.com/s/photos/house"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
+          {imageUrls.length < 5 && (
+            <button
+              type="button"
+              onClick={addImageUrl}
+              className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-gray-300 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors"
             >
-              busca en Unsplash
-            </a>
-            , abre una foto y copia la URL.
-          </p>
+              <Plus size={16} />
+              Agregar otra imagen
+            </button>
+          )}
         </div>
 
         {/* Precio y capacidad en la misma fila */}
@@ -321,6 +360,55 @@ export default function PropertyFormPage() {
             )}
           </div>
         </div>
+
+        {/* Selector de amenidades */}
+        {amenities && amenities.length > 0 && (() => {
+          const amenitiesByCategory = amenities.reduce(
+            (groups, amenity) => {
+              if (!groups[amenity.category]) groups[amenity.category] = []
+              groups[amenity.category].push(amenity)
+              return groups
+            },
+            {} as Record<string, AmenityResponse[]>
+          )
+
+          return (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Comodidades
+              </label>
+              {Object.entries(amenitiesByCategory).map(([category, items]) => (
+                <div key={category} className="mb-4">
+                  <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    {category}
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {items.map(amenity => {
+                      const isSelected = selectedAmenityIds.includes(amenity.id)
+                      return (
+                        <button
+                          key={amenity.id}
+                          type="button"
+                          onClick={() => toggleAmenity(amenity.id)}
+                          className={cn(
+                            'flex items-center gap-2 p-3 rounded-xl border text-sm transition-all duration-150',
+                            isSelected
+                              ? 'border-gray-900 bg-gray-50 font-medium'
+                              : 'border-gray-200 hover:border-gray-400'
+                          )}
+                        >
+                          <AmenityIcon iconName={amenity.icon} size={16} />
+                          {amenity.name}
+                          {isSelected && <Check size={14} className="ml-auto" />}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
 
         {/* Botón submit */}
         <button

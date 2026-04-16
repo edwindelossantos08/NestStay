@@ -1,5 +1,19 @@
 import type { ReviewResponse } from './review.types'
 
+export interface AmenityResponse {
+  id: number
+  name: string
+  // Nombre del ícono de Lucide React
+  icon: string
+  category: string
+}
+
+export interface PropertyImageResponse {
+  id: number
+  url: string
+  displayOrder: number
+}
+
 export interface PropertyResponse {
   id: number
   title: string
@@ -12,6 +26,8 @@ export interface PropertyResponse {
   hostAvatarUrl?: string
   // URL de imagen proporcionada por el host, puede ser null
   imageUrl?: string
+  // Lista de imágenes ordenadas por displayOrder
+  images: PropertyImageResponse[]
   // Coordenadas para el pin en el mapa
   latitude?: number
   longitude?: number
@@ -19,6 +35,7 @@ export interface PropertyResponse {
   totalReviews: number
   createdAt: string
   latestReviews: ReviewResponse[]
+  amenities: AmenityResponse[]
 }
 
 export interface CreatePropertyRequest {
@@ -27,10 +44,11 @@ export interface CreatePropertyRequest {
   location: string
   pricePerNight: number
   capacity: number
-  // Opcional: el host puede pegar una URL de imagen
-  imageUrl?: string
+  // Lista de URLs de imágenes (mínimo 1, máximo 5)
+  imageUrls?: string[]
   latitude?: number
   longitude?: number
+  amenityIds?: number[]
 }
 
 export interface UpdatePropertyRequest {
@@ -39,9 +57,11 @@ export interface UpdatePropertyRequest {
   location: string
   pricePerNight: number
   capacity: number
-  imageUrl?: string
+  // Lista de URLs de imágenes (mínimo 1, máximo 5)
+  imageUrls?: string[]
   latitude?: number
   longitude?: number
+  amenityIds?: number[]
 }
 
 export interface SearchPropertiesRequest {

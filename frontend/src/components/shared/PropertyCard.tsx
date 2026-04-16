@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import { MapPin, Users, Star } from 'lucide-react'
 import type { PropertyResponse } from '../../types/property.types'
 import { formatPrice } from '../../utils/formatters'
-import PropertyImage from './PropertyImage'
+import ImageCarousel from './ImageCarousel'
+import AmenityIcon from './AmenityIcon'
 
 interface PropertyCardProps {
   property: PropertyResponse
@@ -12,20 +13,15 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   return (
     <Link
       to={`/properties/${property.id}`}
-      className="group block focus:outline-none"
+      className="block focus:outline-none"
     >
-      {/* Imagen – aspect-ratio 4/3 */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100">
-        <PropertyImage
-          imageUrl={property.imageUrl}
-          title={property.title}
-          id={property.id}
-          variant="card"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        {/* Overlay sutil en hover */}
-        <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/[0.06]" />
-      </div>
+      {/* Carrusel de imágenes con navegación por flechas y dots */}
+      <ImageCarousel
+        images={property.images || []}
+        imageUrl={property.imageUrl}
+        title={property.title}
+        propertyId={property.id}
+      />
 
       {/* Info */}
       <div className="pt-3 flex flex-col gap-1">
@@ -59,6 +55,26 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           <span className="font-bold">{formatPrice(property.pricePerNight)}</span>
           <span className="font-normal text-gray-500 text-sm"> / noche</span>
         </p>
+
+        {/* Mini chips de amenidades */}
+        {property.amenities && property.amenities.length > 0 && (
+          <div className="flex gap-1 flex-wrap mt-1">
+            {property.amenities.slice(0, 3).map(amenity => (
+              <span
+                key={amenity.id}
+                className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-0.5"
+              >
+                <AmenityIcon iconName={amenity.icon} size={10} />
+                {amenity.name}
+              </span>
+            ))}
+            {property.amenities.length > 3 && (
+              <span className="text-xs text-gray-400 px-1">
+                +{property.amenities.length - 3}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </Link>
   )

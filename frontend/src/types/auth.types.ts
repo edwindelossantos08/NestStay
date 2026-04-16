@@ -14,6 +14,7 @@ export interface LoginResponse {
   token: string
   expiresAt: string
   userName: string
+  email?: string
   roles: string[]
   avatarUrl?: string
 }

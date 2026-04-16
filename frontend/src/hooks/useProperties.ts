@@ -88,6 +88,14 @@ export const useBlockDates = (propertyId: number) => {
   })
 }
 
+export const useAmenities = () =>
+  useQuery({
+    queryKey: ['amenities'],
+    queryFn: () => propertiesApi.getAmenities().then((r) => r.data.data),
+    // Las amenidades no cambian frecuentemente
+    staleTime: 1000 * 60 * 60,
+  })
+
 export const useUnblockDates = (propertyId: number) => {
   const queryClient = useQueryClient()
   return useMutation({

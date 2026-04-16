@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { MapPin, User, Users, DollarSign, Home } from 'lucide-react'
+import { MapPin, Users, DollarSign, Home, Grid2x2, X } from 'lucide-react'
 import { usePropertyById, usePropertyReviews } from '../../hooks/useProperties'
+import AmenityIcon from '../../components/shared/AmenityIcon'
+import type { AmenityResponse } from '../../types/property.types'
 import { useCreateBooking } from '../../hooks/useBookings'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { authApi } from '../../api/auth.api'
-import PropertyImage from '../../components/shared/PropertyImage'
+import ImageCarousel from '../../components/shared/ImageCarousel'
 import StarRating from '../../components/shared/StarRating'
 import Modal from '../../components/ui/Modal'
 import DateRangePicker from '../../components/shared/DateRangePicker'
@@ -78,6 +80,10 @@ export default function PropertyDetailPage() {
   // Modal para asignar rol Guest si el usuario no lo tiene
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [assigningRole, setAssigningRole] = useState(false)
+  // Modal de galería completa
+  const [galleryOpen, setGalleryOpen] = useState(false)
+  // Controla si se muestran todas las amenidades o solo las primeras 6
+  const [showAllAmenities, setShowAllAmenities] = useState(false)
 
   if (isLoading) return <DetailSkeleton />
 
@@ -155,28 +161,81 @@ export default function PropertyDetailPage() {
     )
   }
 
+  // Construye lista de imágenes con fallbacks de Unsplash
+  const getGalleryImages = (): string[] => {
+    if (property.images && property.images.length > 0) {
+      return property.images
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .map(img => img.url)
+    }
+    // Si solo tiene imageUrl, genera variaciones con Unsplash
+    return Array.from({ length: 5 }, (_, i) =>
+      property.imageUrl ||
+      `https://source.unsplash.com/800x600/?house,room&sig=${property.id + i}`
+    )
+  }
+
+  const galleryImages = getGalleryImages()
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Imagen hero */}
-        <div className="relative w-full h-72 md:h-96 rounded-2xl overflow-hidden mb-8">
-          <PropertyImage
+
+        {/* Título de la propiedad */}
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{property.title}</h1>
+        <p className="flex items-center gap-1 text-gray-500 text-sm mb-4">
+          <MapPin className="h-4 w-4 shrink-0" />
+          {property.location}
+        </p>
+
+        {/* Galería desktop — grid tipo Airbnb */}
+        <div className="hidden md:block relative mb-8">
+          <div className="grid grid-cols-4 grid-rows-2 gap-2 h-96 rounded-2xl overflow-hidden">
+            {/* Imagen principal — ocupa 2 columnas y 2 filas */}
+            <div className="col-span-2 row-span-2 relative">
+              <img
+                src={galleryImages[0]}
+                alt={property.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = `https://source.unsplash.com/800x600/?house&sig=${property.id}`
+                }}
+              />
+            </div>
+
+            {/* Imágenes secundarias — 4 celdas */}
+            {galleryImages.slice(1, 5).map((url, i) => (
+              <div key={i} className="relative overflow-hidden">
+                <img
+                  src={url}
+                  alt={`${property.title} ${i + 2}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://source.unsplash.com/400x300/?house,room&sig=${property.id + i + 1}`
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Botón "Ver todas las fotos" */}
+          <button
+            onClick={() => setGalleryOpen(true)}
+            className="absolute bottom-4 right-4 bg-white text-gray-900 text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 flex items-center gap-2 shadow-sm"
+          >
+            <Grid2x2 size={16} />
+            Ver todas las fotos
+          </button>
+        </div>
+
+        {/* Carrusel móvil — solo visible en pantallas pequeñas */}
+        <div className="md:hidden mb-8">
+          <ImageCarousel
+            images={property.images || []}
             imageUrl={property.imageUrl}
             title={property.title}
-            id={property.id}
-            variant="hero"
-            className="w-full h-full object-cover"
+            propertyId={property.id}
           />
-          {/* Gradiente inferior para legibilidad */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          {/* Título encima de la imagen */}
-          <div className="absolute bottom-4 left-6 text-white">
-            <h1 className="text-3xl font-bold drop-shadow">{property.title}</h1>
-            <p className="text-white/80 mt-0.5 flex items-center gap-1">
-              <MapPin className="h-4 w-4 shrink-0" />
-              {property.location}
-            </p>
-          </div>
         </div>
 
         {/* Layout de dos columnas */}
@@ -215,6 +274,73 @@ export default function PropertyDetailPage() {
                   {property.description}
                 </p>
               </div>
+
+              {/* Sección de amenidades */}
+              {property.amenities && property.amenities.length > 0 && (() => {
+                const visibleAmenities = showAllAmenities
+                  ? property.amenities
+                  : property.amenities.slice(0, 6)
+
+                const amenitiesByCategory = visibleAmenities.reduce(
+                  (groups, amenity) => {
+                    const cat = amenity.category
+                    if (!groups[cat]) groups[cat] = []
+                    groups[cat].push(amenity)
+                    return groups
+                  },
+                  {} as Record<string, AmenityResponse[]>
+                )
+
+                return (
+                  <section className="mt-8 pt-8 border-t border-gray-200">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                      Lo que ofrece este lugar
+                    </h2>
+
+                    {/* Agrupa amenidades por categoría */}
+                    {Object.entries(amenitiesByCategory).map(([category, amenities]) => (
+                      <div key={category} className="mb-6">
+                        {/* Título de categoría */}
+                        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
+                          {category}
+                        </h3>
+
+                        {/* Grid de amenidades */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {amenities.map(amenity => (
+                            <div
+                              key={amenity.id}
+                              className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-gray-400 transition-colors"
+                            >
+                              <AmenityIcon
+                                iconName={amenity.icon}
+                                size={20}
+                                className="text-gray-700 flex-shrink-0"
+                              />
+                              <span className="text-sm text-gray-700">
+                                {amenity.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Si hay más de 6 amenidades mostrar botón ver más */}
+                    {property.amenities.length > 6 && (
+                      <button
+                        onClick={() => setShowAllAmenities(!showAllAmenities)}
+                        className="mt-2 border border-gray-900 rounded-xl px-6 py-3 text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        {showAllAmenities
+                          ? 'Mostrar menos'
+                          : `Mostrar las ${property.amenities.length} comodidades`
+                        }
+                      </button>
+                    )}
+                  </section>
+                )
+              })()}
 
               {/* Sección del mapa — solo si hay ubicación */}
               <section className="mt-8 pt-8 border-t border-gray-200">
@@ -338,8 +464,8 @@ export default function PropertyDetailPage() {
                   {booking
                     ? 'Reservando...'
                     : isAuthenticated
-                    ? 'Reservar ahora'
-                    : 'Inicia sesión para reservar'}
+                      ? 'Reservar ahora'
+                      : 'Inicia sesión para reservar'}
                 </button>
 
                 {!isAuthenticated && (
@@ -359,6 +485,32 @@ export default function PropertyDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de galería completa — fondo negro, grid de 2 columnas */}
+      {galleryOpen && (
+        <div className="fixed inset-0 z-50 bg-black overflow-y-auto">
+          <button
+            onClick={() => setGalleryOpen(false)}
+            className="fixed top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+          >
+            <X size={24} />
+          </button>
+          <div className="max-w-4xl mx-auto px-4 py-16 grid grid-cols-2 gap-2">
+            {galleryImages.map((url, i) => (
+              <div key={i} className="aspect-[4/3] overflow-hidden rounded-lg">
+                <img
+                  src={url}
+                  alt={`${property.title} ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://source.unsplash.com/800x600/?house,room&sig=${property.id + i}`
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Modal para asignar rol Guest si el usuario no lo tiene */}
       <Modal
